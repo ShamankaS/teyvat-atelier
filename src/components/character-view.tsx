@@ -108,7 +108,12 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
       </Link>
 
       <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/4 p-5 sm:flex-row sm:items-center">
-        <CharacterAvatar name={name} element={build.info?.element} size="lg" />
+        <CharacterAvatar
+          characterKey={character.key}
+          name={name}
+          element={build.info?.element}
+          size="lg"
+        />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-semibold">{name}</h1>
