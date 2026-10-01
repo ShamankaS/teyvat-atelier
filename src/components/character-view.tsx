@@ -338,7 +338,15 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                     {guide.talentPriority
                       .map((t) => (t === "auto" ? "авто" : t === "skill" ? "навык" : "ульта"))
                       .join(" > ")}
-                    .
+                    .{" "}
+                    <a
+                      href={guide.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline-offset-2 hover:underline"
+                    >
+                      Prydwen
+                    </a>
                   </p>
                 </CardContent>
               </Card>

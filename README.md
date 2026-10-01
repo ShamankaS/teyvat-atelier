@@ -10,14 +10,14 @@ No backend, no Hoyoverse login, no database. Parsing and scoring run in the brow
 
 Genshin guides usually say “Homa is BiS” or “farm Emblem 4pc”. This tool answers the next question: **how far is *your* build from that, and what swap is worth the most right now** — including weapons that are already in the inventory but equipped on someone else.
 
-It is a decision helper, not a rotation simulator. Relative weapon/set numbers are typical **team DPS vs R1 BiS** in a named reference team (KQM / TCL / community sheets), rounded.
+It is a decision helper, not a rotation simulator. Relative weapon/set numbers are typical **team DPS vs R1 BiS** in a named reference team, rounded. Primary sheet source: [Prydwen.gg](https://www.prydwen.gg/genshin-impact) (full builds where published, otherwise Enka usage), cross-checked with KQM / TCL / community calcs.
 
 ## Stack
 
 - **Next.js** (App Router) + **TypeScript**
 - **Tailwind CSS** + **shadcn/ui**
 - Domain logic in `src/lib` (GOOD parser, stat totals, ranked suggestions)
-- Guide tables in `src/data/guides.ts`
+- Guide tables in `src/data/guides.ts` (Prydwen + KQM/TCL)
 
 ## Features
 

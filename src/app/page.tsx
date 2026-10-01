@@ -25,7 +25,16 @@ export default function Home() {
             <ul className="list-disc space-y-2 pl-4 text-muted-foreground">
               <li>100% — лучшее оружие или сет в указанной пачке, R1 сигнатурки, team DPS, не соло.</li>
               <li>
-                Цифры агрегированы по KQM / TCL / популярным калькам. Это не живой симулятор ротации.
+                Цифры сверены с{" "}
+                <a
+                  href="https://www.prydwen.gg/genshin-impact"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline-offset-2 hover:underline"
+                >
+                  Prydwen
+                </a>
+                , плюс KQM / TCL / community sheets. Это не живой симулятор ротации.
               </li>
               <li>
                 Предложение «+8 п.п.» — разница табличных процентов, а не гарантия бездны.
