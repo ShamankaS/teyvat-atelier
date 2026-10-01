@@ -8,29 +8,57 @@ import { ScoreRing } from "@/components/score-ring";
 import { useAccount } from "@/components/account-provider";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 
+type Filter = "built" | "guide" | "needs" | "all";
+
 export function RosterGrid() {
-  const { analyses } = useAccount();
+  const { analyses, loading } = useAccount();
   const [q, setQ] = useState("");
+  const [filter, setFilter] = useState<Filter>("guide");
 
   const rows = useMemo(() => {
     const query = q.trim().toLowerCase();
     return analyses.filter((a) => {
       const name = characterName(a.character.key).toLowerCase();
-      return !query || name.includes(query) || a.character.key.toLowerCase().includes(query);
+      const match = !query || name.includes(query) || a.character.key.toLowerCase().includes(query);
+      if (!match) return false;
+      const dressed = a.build.artifacts.length >= 5;
+      const hasGuide = Boolean(GUIDES[a.character.key]);
+      const needs = a.suggestions.some((s) => s.severity === "high");
+      if (filter === "built") return dressed || a.character.level >= 80;
+      if (filter === "guide") return hasGuide;
+      if (filter === "needs") return needs && (dressed || a.character.level >= 70);
+      return true;
     });
-  }, [analyses, q]);
+  }, [analyses, q, filter]);
+
+  if (loading && analyses.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground" id="roster">
+        Загружаю аккаунт…
+      </p>
+    );
+  }
 
   if (analyses.length === 0) return null;
 
+  const filters: { id: Filter; label: string }[] = [
+    { id: "built", label: "Одетые" },
+    { id: "needs", label: "Нужна работа" },
+    { id: "guide", label: "Есть гайд" },
+    { id: "all", label: `Все (${analyses.length})` },
+  ];
+
   return (
-      <section id="roster" className="scroll-mt-6 space-y-4">
+    <section id="roster" className="scroll-mt-6 space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold">Персонажи на аккаунте</h2>
           <p className="text-sm text-muted-foreground">
-            Сначала те, кому оптимизация даст больше всего. Оценка — смесь оружия, сета, капов и талантов.
+            Показано {rows.length}. Сначала те, кому оптимизация даст больше.
           </p>
         </div>
         <Input
@@ -39,6 +67,20 @@ export function RosterGrid() {
           placeholder="Поиск…"
           className="sm:max-w-56"
         />
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {filters.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setFilter(f.id)}
+            className={cn(
+              buttonVariants({ variant: filter === f.id ? "default" : "outline", size: "sm" }),
+            )}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((a) => {

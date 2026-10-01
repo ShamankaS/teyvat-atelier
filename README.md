@@ -11,13 +11,13 @@ npm install
 npm run dev
 ```
 
-Откройте [http://localhost:43147](http://localhost:43147). Нажмите «Демо-аккаунт», если своего JSON ещё нет.
+Откройте [http://localhost:43147](http://localhost:43147). По умолчанию загружается экспорт аккаунта (`public/my-account.json`). Кнопка «Учебное демо» включает маленький искусственный JSON.
 
 Сборка: `npm run build` и `npm start`.
 
 ## Формат JSON
 
-Сейчас поддерживается **GOOD** (Genshin Open Object Description) — тот же экспорт, что у [Genshin Optimizer](https://frzyc.github.io/genshin-optimizer/). Нужны массивы:
+Сейчас поддерживается **GOOD v2 и v3** — экспорт [Irminsul](https://github.com/jnrsmcu/Irminsul) и [Genshin Optimizer](https://frzyc.github.io/genshin-optimizer/). Нужны массивы:
 
 - `characters` — `key`, `level`, `constellation`, `ascension`, `talent: { auto, skill, burst }`
 - `weapons` — `key`, `level`, `ascension`, `refinement`, `location` (ключ персонажа или пустая строка)
@@ -35,7 +35,7 @@ npm run dev
 
 ## Покрытие гайдов
 
-Ху Тао, Райдэн, Нахида, Фурина, Нёвиллет, Арлекино, Е Лань, Сян Лин, Беннет, Син Цю, Чжун Ли, Кадзуха, Мавуика, Кинич, Навия, Аль-Хайтам.
+Ху Тао, Райдэн, Нахида, Фурина, Нёвиллет, Арлекино, Е Лань, Сян Лин, Беннет, Син Цю, Чжун Ли, Кадзуха, Мавуика, Кинич, Навия, Аль-Хайтам, Ёимия, Гань Юй, Аяка, Клоринда, Муалани, Шилонен, Кокоми, Нилу, Ситлали, Эскофье, Вареса, Яэ Мико, Ризли, Фишль, Синобу, Шеврёз, Сахароза, Шэнь Хэ, Тигнари, Мона, Джинн.
 
 Остальные персонажи из JSON появятся в списке, но без процентных таблиц.
 

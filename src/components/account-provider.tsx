@@ -19,19 +19,23 @@ const SAMPLE: GoodAccount = sampleAccount as GoodAccount;
 interface AccountState {
   account: GoodAccount | null;
   error: string | null;
+  loading: boolean;
   analyses: Analysis[];
   loadJson: (text: string) => boolean;
   loadSample: () => void;
+  loadMyAccount: () => Promise<void>;
   clear: () => void;
 }
 
 const Ctx = createContext<AccountState | null>(null);
 
 export function AccountProvider({ children }: { children: ReactNode }) {
-  const [account, setAccount] = useState<GoodAccount | null>(SAMPLE);
+  const [account, setAccount] = useState<GoodAccount | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [started, setStarted] = useState(false);
 
-  const loadJson = useCallback((text: string) => {
+  const applyText = useCallback((text: string) => {
     const parsed = parseAccountJson(text);
     if ("error" in parsed) {
       setError(parsed.error);
@@ -42,13 +46,41 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed.account));
     } catch {
-      /* private mode — still keep in-memory account */
+      /* ignore quota */
     }
     return true;
   }, []);
 
+  const loadMyAccount = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/my-account.json");
+      if (!res.ok) throw new Error("no file");
+      const text = await res.text();
+      if (!applyText(text)) setAccount(SAMPLE);
+    } catch {
+      setAccount(SAMPLE);
+    } finally {
+      setLoading(false);
+    }
+  }, [applyText]);
+
+  if (!started) {
+    setStarted(true);
+    void loadMyAccount();
+  }
+
+  const loadJson = useCallback(
+    (text: string) => {
+      setLoading(false);
+      return applyText(text);
+    },
+    [applyText],
+  );
+
   const loadSample = useCallback(() => {
     setError(null);
+    setLoading(false);
     setAccount(SAMPLE);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLE));
@@ -78,8 +110,17 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   }, [account]);
 
   const value = useMemo(
-    () => ({ account, error, analyses, loadJson, loadSample, clear }),
-    [account, error, analyses, loadJson, loadSample, clear],
+    () => ({
+      account,
+      error,
+      loading,
+      analyses,
+      loadJson,
+      loadSample,
+      loadMyAccount,
+      clear,
+    }),
+    [account, error, loading, analyses, loadJson, loadSample, loadMyAccount, clear],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

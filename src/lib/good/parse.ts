@@ -1,4 +1,74 @@
-import type { GoodAccount, GoodArtifact } from "@/lib/good/types";
+import type { GoodAccount, GoodArtifact, GoodCharacter, GoodWeapon } from "@/lib/good/types";
+
+function asCharacter(raw: unknown): GoodCharacter | null {
+  if (!raw || typeof raw !== "object") return null;
+  const c = raw as Record<string, unknown>;
+  if (typeof c.key !== "string") return null;
+  const talent = (c.talent ?? {}) as Record<string, unknown>;
+  return {
+    key: c.key,
+    level: Number(c.level) || 1,
+    constellation: Number(c.constellation) || 0,
+    ascension: Number(c.ascension) || 0,
+    talent: {
+      auto: Number(talent.auto) || 1,
+      skill: Number(talent.skill) || 1,
+      burst: Number(talent.burst) || 1,
+    },
+  };
+}
+
+function asWeapon(raw: unknown): GoodWeapon | null {
+  if (!raw || typeof raw !== "object") return null;
+  const w = raw as Record<string, unknown>;
+  if (typeof w.key !== "string") return null;
+  return {
+    key: w.key,
+    level: Number(w.level) || 1,
+    ascension: Number(w.ascension) || 0,
+    refinement: Number(w.refinement) || 1,
+    location: typeof w.location === "string" ? w.location : "",
+    lock: Boolean(w.lock),
+  };
+}
+
+function asArtifact(raw: unknown): GoodArtifact | null {
+  if (!raw || typeof raw !== "object") return null;
+  const a = raw as Record<string, unknown>;
+  if (typeof a.setKey !== "string" || typeof a.slotKey !== "string") return null;
+  const substats = Array.isArray(a.substats)
+    ? a.substats
+        .map((s) => {
+          if (!s || typeof s !== "object") return null;
+          const sub = s as Record<string, unknown>;
+          if (typeof sub.key !== "string") return null;
+          return { key: sub.key, value: Number(sub.value) || 0 };
+        })
+        .filter((x): x is { key: string; value: number } => Boolean(x))
+    : [];
+  return {
+    setKey: a.setKey,
+    slotKey: a.slotKey,
+    level: Number(a.level) || 0,
+    rarity: Number(a.rarity) || 5,
+    mainStatKey: typeof a.mainStatKey === "string" ? a.mainStatKey : "hp",
+    location: typeof a.location === "string" ? a.location : "",
+    lock: Boolean(a.lock),
+    substats,
+  };
+}
+
+function remapTraveler(account: GoodAccount) {
+  const travelers = account.characters.filter((c) => c.key.startsWith("Traveler"));
+  if (travelers.length !== 1) return;
+  const dest = travelers[0].key;
+  for (const w of account.weapons) {
+    if (w.location === "Traveler") w.location = dest;
+  }
+  for (const a of account.artifacts) {
+    if (a.location === "Traveler") a.location = dest;
+  }
+}
 
 export function parseAccountJson(text: string): { account: GoodAccount } | { error: string } {
   let raw: unknown;
@@ -18,25 +88,26 @@ export function parseAccount(raw: unknown): { account: GoodAccount } | { error: 
   if (!Array.isArray(v.characters) || !Array.isArray(v.weapons) || !Array.isArray(v.artifacts)) {
     return {
       error:
-        "Нужны массивы characters, weapons и artifacts. Формат — GOOD (Genshin Open Object Description), как в Genshin Optimizer.",
+        "Нужны массивы characters, weapons и artifacts. Подходит GOOD v2/v3 (Genshin Optimizer, Irminsul).",
     };
+  }
+
+  const characters = v.characters.map(asCharacter).filter((x): x is GoodCharacter => Boolean(x));
+  const weapons = v.weapons.map(asWeapon).filter((x): x is GoodWeapon => Boolean(x));
+  const artifacts = v.artifacts.map(asArtifact).filter((x): x is GoodArtifact => Boolean(x));
+
+  if (characters.length === 0) {
+    return { error: "В JSON нет персонажей." };
   }
 
   const account: GoodAccount = {
     format: typeof v.format === "string" ? v.format : "GOOD",
-    version: typeof v.version === "number" ? v.version : 2,
+    version: typeof v.version === "number" ? v.version : 3,
     source: typeof v.source === "string" ? v.source : "import",
-    characters: v.characters as GoodAccount["characters"],
-    weapons: v.weapons as GoodAccount["weapons"],
-    artifacts: (v.artifacts as GoodArtifact[]).map((a) => ({
-      ...a,
-      substats: Array.isArray(a.substats) ? a.substats : [],
-    })),
+    characters,
+    weapons,
+    artifacts,
   };
-
-  if (account.characters.length === 0) {
-    return { error: "В JSON нет персонажей." };
-  }
-
+  remapTraveler(account);
   return { account };
 }

@@ -113,7 +113,10 @@ export function analyzeCharacter(account: GoodAccount, character: GoodCharacter)
   });
 
   let weaponRelative = weaponRank?.relative ?? 72;
-  if (build.weaponGood?.key === "DragonBane" || build.weaponGood?.key === "DragonsBane") {
+  if (
+    character.key === "HuTao" &&
+    (build.weaponGood?.key === "DragonBane" || build.weaponGood?.key === "DragonsBane")
+  ) {
     const refine = build.weaponGood.refinement ?? 1;
     weaponRelative = 90 + ((refine - 1) / 4) * 6;
   }
@@ -304,5 +307,10 @@ export function analyzeCharacter(account: GoodAccount, character: GoodCharacter)
 export function analyzeAccount(account: GoodAccount) {
   return account.characters
     .map((c) => analyzeCharacter(account, c))
-    .sort((a, b) => a.overall - b.overall);
+    .sort((a, b) => {
+      const ag = a.guide ? 0 : 1;
+      const bg = b.guide ? 0 : 1;
+      if (ag !== bg) return ag - bg;
+      return a.overall - b.overall;
+    });
 }
