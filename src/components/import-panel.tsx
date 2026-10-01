@@ -2,30 +2,24 @@
 
 import { useRef, useState } from "react";
 import { Upload, FileJson, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAccount } from "@/components/account-provider";
+import sampleAccount from "../../public/sample-account.json";
+import { cn } from "@/lib/utils";
 
 export function ImportPanel() {
   const { loadJson, error, account, clear } = useAccount();
   const inputRef = useRef<HTMLInputElement>(null);
   const [drag, setDrag] = useState(false);
-  const [loadingSample, setLoadingSample] = useState(false);
 
   async function fromFile(file: File) {
     const text = await file.text();
     loadJson(text);
   }
 
-  async function loadSample() {
-    setLoadingSample(true);
-    try {
-      const res = await fetch("/sample-account.json");
-      const text = await res.text();
-      loadJson(text);
-    } finally {
-      setLoadingSample(false);
-    }
+  function loadSample() {
+    loadJson(JSON.stringify(sampleAccount));
   }
 
   return (
@@ -52,18 +46,26 @@ export function ImportPanel() {
           Формат GOOD — как в Genshin Optimizer. Свой формат подключим, когда пришлёте схему.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-          <Button onClick={() => inputRef.current?.click()}>
+          <button
+            type="button"
+            className={cn(buttonVariants())}
+            onClick={() => inputRef.current?.click()}
+          >
             <Upload />
             Выбрать файл
-          </Button>
-          <Button variant="secondary" onClick={() => void loadSample()} disabled={loadingSample}>
+          </button>
+          <button
+            type="button"
+            className={cn(buttonVariants({ variant: "secondary" }))}
+            onClick={loadSample}
+          >
             <Sparkles />
             Демо-аккаунт
-          </Button>
+          </button>
           {account ? (
-            <Button variant="ghost" onClick={clear}>
+            <button type="button" className={cn(buttonVariants({ variant: "ghost" }))} onClick={clear}>
               Сбросить
-            </Button>
+            </button>
           ) : null}
         </div>
         <input

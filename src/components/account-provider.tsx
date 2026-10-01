@@ -6,7 +6,6 @@ import {
   useContext,
   useMemo,
   useState,
-  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import type { GoodAccount } from "@/lib/good/types";
@@ -25,39 +24,29 @@ interface AccountState {
 
 const Ctx = createContext<AccountState | null>(null);
 
-function subscribe(onStoreChange: () => void) {
-  if (typeof window === "undefined") return () => {};
-  window.addEventListener("storage", onStoreChange);
-  window.addEventListener("teyvat-atelier-account", onStoreChange);
-  return () => {
-    window.removeEventListener("storage", onStoreChange);
-    window.removeEventListener("teyvat-atelier-account", onStoreChange);
-  };
-}
-
-function getSnapshot() {
-  return localStorage.getItem(STORAGE_KEY);
-}
-
-function getServerSnapshot() {
-  return null;
-}
-
-function parseStored(raw: string | null): GoodAccount | null {
-  if (!raw) return null;
-  const parsed = parseAccountJson(raw);
-  if ("error" in parsed) return null;
-  return parsed.account;
-}
-
-function notify() {
-  window.dispatchEvent(new Event("teyvat-atelier-account"));
+function readStored(): GoodAccount | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = parseAccountJson(raw);
+    if ("error" in parsed) return null;
+    return parsed.account;
+  } catch {
+    return null;
+  }
 }
 
 export function AccountProvider({ children }: { children: ReactNode }) {
-  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [account, setAccount] = useState<GoodAccount | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const account = useMemo(() => parseStored(raw), [raw]);
+  const [didRestore, setDidRestore] = useState(false);
+
+  if (!didRestore) {
+    setDidRestore(true);
+    const stored = readStored();
+    if (stored) setAccount(stored);
+  }
 
   const loadJson = useCallback((text: string) => {
     const parsed = parseAccountJson(text);
@@ -66,21 +55,34 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       return false;
     }
     setError(null);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed.account));
-    notify();
+    setAccount(parsed.account);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed.account));
+    } catch {
+      setError("Аккаунт загружен, но браузер не дал сохранить его в localStorage.");
+    }
     return true;
   }, []);
 
   const clear = useCallback(() => {
+    setAccount(null);
     setError(null);
-    localStorage.removeItem(STORAGE_KEY);
-    notify();
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
   }, []);
 
-  const analyses = useMemo(
-    () => (account ? analyzeAccount(account) : []),
-    [account],
-  );
+  const analyses = useMemo(() => {
+    if (!account) return [];
+    try {
+      return analyzeAccount(account);
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  }, [account]);
 
   const value = useMemo(
     () => ({ account, error, analyses, loadJson, clear }),
