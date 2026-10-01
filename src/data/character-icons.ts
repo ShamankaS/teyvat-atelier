@@ -105,6 +105,7 @@ export const CHARACTER_ICON_KEYS: Record<string, string> = {
   TravelerGeo: "PlayerBoy",
   TravelerHydro: "PlayerBoy",
   TravelerPyro: "PlayerBoy",
+  TravelerCryo: "PlayerBoy",
   Varesa: "Varesa",
   Varka: "Varka",
   Venti: "Venti",

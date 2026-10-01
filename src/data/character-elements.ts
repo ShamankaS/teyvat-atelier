@@ -107,6 +107,7 @@ export const CHARACTER_ELEMENTS: Record<string, ElementKey> = {
   TravelerGeo: "geo",
   TravelerHydro: "hydro",
   TravelerPyro: "pyro",
+  TravelerCryo: "cryo",
   Varesa: "electro",
   Varka: "anemo",
   Venti: "anemo",

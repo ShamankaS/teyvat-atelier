@@ -104,6 +104,7 @@ export const CHARACTER_NAMES: Record<string, string> = {
   TravelerGeo: "Путешественник (Гео)",
   TravelerHydro: "Путешественник (Гидро)",
   TravelerPyro: "Путешественник (Пиро)",
+  TravelerCryo: "Путешественник (Крио)",
   Varesa: "Вареса",
   Varka: "Варка",
   Venti: "Венти",
