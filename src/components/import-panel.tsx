@@ -5,21 +5,18 @@ import { Upload, FileJson, Sparkles } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAccount } from "@/components/account-provider";
-import sampleAccount from "../../public/sample-account.json";
 import { cn } from "@/lib/utils";
 
 export function ImportPanel() {
-  const { loadJson, error, account, clear } = useAccount();
+  const { loadJson, loadSample, error, account, clear } = useAccount();
   const inputRef = useRef<HTMLInputElement>(null);
   const [drag, setDrag] = useState(false);
 
   async function fromFile(file: File) {
     const text = await file.text();
-    loadJson(text);
-  }
-
-  function loadSample() {
-    loadJson(JSON.stringify(sampleAccount));
+    if (loadJson(text)) {
+      document.getElementById("roster")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   return (
@@ -43,7 +40,7 @@ export function ImportPanel() {
         <FileJson className="mx-auto mb-3 size-10 text-primary" />
         <p className="text-lg font-medium">Загрузите JSON аккаунта</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Формат GOOD — как в Genshin Optimizer. Свой формат подключим, когда пришлёте схему.
+          Формат GOOD — как в Genshin Optimizer. Ниже уже открыт демо-аккаунт — его можно заменить своим файлом.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           <button
@@ -57,7 +54,10 @@ export function ImportPanel() {
           <button
             type="button"
             className={cn(buttonVariants({ variant: "secondary" }))}
-            onClick={loadSample}
+            onClick={() => {
+              loadSample();
+              document.getElementById("roster")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
           >
             <Sparkles />
             Демо-аккаунт

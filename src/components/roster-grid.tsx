@@ -25,7 +25,7 @@ export function RosterGrid() {
   if (analyses.length === 0) return null;
 
   return (
-    <section className="space-y-4">
+      <section id="roster" className="scroll-mt-6 space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold">Персонажи на аккаунте</h2>
