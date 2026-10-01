@@ -1,97 +1,98 @@
 # Teyvat Atelier
 
-Локальный сайт по **Genshin Impact**: вы открываете свой аккаунт из JSON и смотрите, насколько текущий билд персонажа отстаёт от гайда в процентах — оружие, сеты, капы статов, таланты — и что менять в первую очередь.
+Local web app for **Genshin Impact** account reviews. You import a GOOD JSON export (Irminsul or Genshin Optimizer), pick a character, and see how the equipped weapon, artifact sets, main stats, talent levels, and stat caps compare to community guide tables — **in percent**, not vague “this is better”.
 
-Данные не уходят в интернет: JSON читается локально и может сохраниться только в браузере (`localStorage`).
+No backend, no Hoyoverse login, no database. Parsing and scoring run in the browser. Optional `localStorage` keeps the last import on this machine.
 
 ---
 
-## Как запустить
+## Why this exists
 
-Нужны **Node.js 20+** и **npm** (оба ставятся с [nodejs.org](https://nodejs.org/)).
+Genshin guides usually say “Homa is BiS” or “farm Emblem 4pc”. This tool answers the next question: **how far is *your* build from that, and what swap is worth the most right now** — including weapons that are already in the inventory but equipped on someone else.
 
-В терминале, в папке проекта:
+It is a decision helper, not a rotation simulator. Relative weapon/set numbers are typical **team DPS vs R1 BiS** in a named reference team (KQM / TCL / community sheets), rounded.
+
+## Stack
+
+- **Next.js** (App Router) + **TypeScript**
+- **Tailwind CSS** + **shadcn/ui**
+- Domain logic in `src/lib` (GOOD parser, stat totals, ranked suggestions)
+- Guide tables in `src/data/guides.ts`
+
+## Features
+
+- GOOD **v2 and v3** import (extra Irminsul fields are ignored; Traveler gear is remapped onto the traveler element in the file)
+- Roster with search and filters: guided characters, fully geared, high-priority issues, everyone
+- Per-character views: optimization queue with **percentage-point deltas**, current loadout, full weapon/set tables
+- Inventory-aware weapon suggestions
+- Bundled account JSON so the app is usable without a file picker
+
+## Project layout
+
+```
+src/app/                 # pages
+src/components/          # UI
+src/data/guides.ts       # relative DPS tables and stat caps
+src/data/catalog.ts      # names, weapon stats, set bonuses
+src/lib/good/            # GOOD types + parser
+src/lib/compute.ts       # equipped stats from artifacts/weapons
+src/lib/analyze.ts       # compare loadout vs guide → suggestions
+public/my-account.json   # default GOOD export loaded on start
+public/sample-account.json
+```
+
+## Run locally
+
+Requires **Node.js 20+**.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Дождитесь строки вроде `Ready` / `Local:`. Сервер слушает порт **43147**.
+Open **http://localhost:43147** (fallback **http://127.0.0.1:43147**).
 
-### Что открыть в браузере
-
-**http://localhost:43147**
-
-Если страница не открылась, попробуйте **http://127.0.0.1:43147**.
-
-Остановка: в том же терминале `Ctrl+C`.
-
-Повторный запуск после остановки: снова `npm run dev` (повторный `npm install` не нужен, пока не менялись зависимости).
-
-Сборка «как на проде»:
+Stop with `Ctrl+C`. Production-style run:
 
 ```bash
 npm run build
 npm start
 ```
 
-Снова открывайте **http://localhost:43147**.
+### On the site
 
----
+1. The home page loads `public/my-account.json` by default.
+2. Scroll to **Персонажи на аккаунте**.
+3. Start with filter **Есть гайд**, then open a card.
+4. Tabs: **Оптимизация** (what to change and by how many pp), **Как одет**, **Таблицы %**.
 
-## Что делать на сайте
-
-1. Главная сразу грузит ваш экспорт (`public/my-account.json`, формат GOOD v3 из Irminsul).
-2. Прокрутите вниз до блока **«Персонажи на аккаунте»**.
-3. Фильтры:
-   - **Есть гайд** — персонажи с таблицами % (удобно начать отсюда);
-   - **Одетые** — на ком надеты 5 артефактов или уровень 80+;
-   - **Нужна работа** — сильные замечания;
-   - **Все** — весь ростер, включая 20-уровневых.
-4. Нажмите карточку персонажа (например Ху Тао или Райдэн).
-5. На странице персонажа три вкладки:
-   - **Оптимизация** — очередь правок с приростом в процентных пунктах и капы статов;
-   - **Как одет** — текущее оружие, сеты, артефакты, сводка статов;
-   - **Таблицы %** — оружие и сеты относительно BiS в референсной пачке.
-
-Кнопки на главной:
-
-| Кнопка | Что делает |
+| Button | Action |
 | --- | --- |
-| **Выбрать файл** | Загрузить другой JSON с диска |
-| **Мой аккаунт** | Снова открыть `public/my-account.json` |
-| **Учебное демо** | Маленький искусственный аккаунт для проверки интерфейса |
-| **Сбросить** | Убрать аккаунт с экрана |
+| Выбрать файл | Import another GOOD JSON from disk |
+| Мой аккаунт | Reload `public/my-account.json` |
+| Учебное демо | Small synthetic account |
+| Сбросить | Clear the current account from the UI |
 
-Чтобы подставить свежий экспорт: сохраните файл как `public/my-account.json` **или** просто «Выбрать файл». Формат — GOOD v2/v3 (Irminsul или Genshin Optimizer).
+## JSON format
 
----
-
-## Формат JSON
-
-Нужны массивы:
+GOOD objects with:
 
 - `characters` — `key`, `level`, `constellation`, `ascension`, `talent: { auto, skill, burst }`
-- `weapons` — `key`, `level`, `ascension`, `refinement`, `location` (ключ персонажа или пустая строка)
+- `weapons` — `key`, `level`, `ascension`, `refinement`, `location`
 - `artifacts` — `setKey`, `slotKey`, `level`, `rarity`, `mainStatKey`, `location`, `substats`
 
-Учебный пример: `public/sample-account.json`.
+## Guide coverage
 
-## Как считаются проценты
+Hu Tao, Raiden, Nahida, Furina, Neuvillette, Arlecchino, Yelan, Xiangling, Bennett, Xingqiu, Zhongli, Kazuha, Mavuika, Kinich, Navia, Alhaitham, Yoimiya, Ganyu, Ayaka, Clorinde, Mualani, Xilonen, Kokomi, Nilou, Citlali, Escoffier, Varesa, Yae Miko, Wriothesley, Fischl, Shinobu, Chevreuse, Sucrose, Shenhe, Tighnari, Mona, Jean.
 
-Таблицы в `src/data/guides.ts` — типичный **team DPS** относительно BiS R1 в указанной пачке (не соло-урон). Источники: KQM, TCL и популярные кальки; цифры округлены.
+Other imported characters still appear in the roster without percent tables.
 
-«+10 п.п.» — разница табличных процентов (или оценка за кап/основной стат), не симулятор ротации.
+## Out of scope (on purpose)
 
-Боевые стаки сетов, если сет это подразумевает: Охотник Сумеречного двора +36% крит. шанса, Обсидиановый кодекс +40%.
+- No Hoyoverse / Enka live fetch
+- No auth or server-side storage
+- No full team buff graph or hit-by-hit optimizer (that is [Genshin Optimizer](https://frzyc.github.io/genshin-optimizer/) territory)
 
-## Покрытие гайдов
+## License
 
-Ху Тао, Райдэн, Нахида, Фурина, Нёвиллет, Арлекино, Е Лань, Сян Лин, Беннет, Син Цю, Чжун Ли, Кадзуха, Мавуика, Кинич, Навия, Аль-Хайтам, Ёимия, Гань Юй, Аяка, Клоринда, Муалани, Шилонен, Кокоми, Нилу, Ситлали, Эскофье, Вареса, Яэ Мико, Ризли, Фишль, Синобу, Шеврёз, Сахароза, Шэнь Хэ, Тигнари, Мона, Джинн.
-
-Остальные персонажи из JSON видны в списке, но без процентных таблиц.
-
-## Что сознательно не сделано
-
-Нет авторизации, базы и парсинга аккаунта с серверов HoYoverse. Нет полного калькулятора Genshin Optimizer: нет команды, баффов пачки и точной симуляции ударов.
+MIT. See `LICENSE`.
