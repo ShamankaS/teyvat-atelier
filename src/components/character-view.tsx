@@ -7,7 +7,7 @@ import { setName } from "@/data/sets";
 import { weaponName } from "@/data/weapons";
 import { statLabel } from "@/data/catalog";
 import { CharacterAvatar } from "@/components/character-avatar";
-import { WeaponIcon } from "@/components/weapon-icon";
+import { WeaponIcon, weaponRarity } from "@/components/weapon-icon";
 import { ScoreRing } from "@/components/score-ring";
 import { useAccount } from "@/components/account-provider";
 import { Badge } from "@/components/ui/badge";
@@ -351,7 +351,7 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                                   {weaponName(w.key)}
                                   <span className="font-normal text-muted-foreground">
                                     {" "}
-                                    · {ownershipLabel(own)}
+                                    · {weaponRarity(w.key) ?? "?"}★ · {ownershipLabel(own)}
                                   </span>
                                 </span>
                                 <span className="shrink-0 tabular-nums text-sm text-primary">{w.relative}%</span>
