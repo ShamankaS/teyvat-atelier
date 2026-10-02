@@ -14,6 +14,7 @@ import {
   ELEMENT_SURFACE,
 } from "@/data/element-theme";
 import { CharacterAvatar } from "@/components/character-avatar";
+import { WeaponIcon, weaponRarity } from "@/components/weapon-icon";
 import { ScoreRing } from "@/components/score-ring";
 import { useAccount } from "@/components/account-provider";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatStatValue } from "@/lib/stats";
+import { weaponOwnership, type WeaponOwnership } from "@/lib/compute";
 import { cn } from "@/lib/utils";
 import type { Analysis } from "@/lib/analyze";
 import type { ElementKey } from "@/lib/good/types";
@@ -34,6 +36,27 @@ const KIND_LABEL = {
   level: "Уровень",
   cap: "Кап стата",
 };
+
+/** Ownership chrome tuned for element-tinted surfaces (not primary/sky which clash). */
+const OWNERSHIP_ROW: Record<WeaponOwnership["status"], string> = {
+  equipped: "border-2 border-white/85 bg-black/40",
+  owned: "border border-emerald-300/55 bg-emerald-950/60",
+  elsewhere: "border border-rose-400/55 bg-rose-950/55",
+  missing: "border border-white/10 bg-black/45 opacity-55",
+};
+
+function ownershipLabel(own: WeaponOwnership): string {
+  switch (own.status) {
+    case "equipped":
+      return `на персонаже · R${own.refinement}`;
+    case "owned":
+      return `в аккаунте · R${own.refinement}`;
+    case "elsewhere":
+      return `на ${characterName(own.location)} · R${own.refinement}`;
+    case "missing":
+      return "нет в аккаунте";
+  }
+}
 
 function RarityStars({ rarity }: { rarity: 4 | 5 }) {
   return (
@@ -420,42 +443,65 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
         <TabsContent value="guide">
           {guide ? (
             <div className="grid gap-4 lg:grid-cols-2">
-              <ThemedCard element={element}>
+                            <ThemedCard element={element}>
                 <CardHeader>
                   <CardTitle>Оружие относительно BiS</CardTitle>
                   <CardDescription>{guide.scenario}</CardDescription>
+                  <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    <li className="flex items-center gap-1.5">
+                      <span
+                        className="size-2.5 rounded-[2px] border-2 border-white/85 bg-black/40"
+                        aria-hidden
+                      />
+                      на персонаже
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-emerald-300" aria-hidden />
+                      в аккаунте
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-rose-400" aria-hidden />
+                      на другом
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-white/25" aria-hidden />
+                      нет в аккаунте
+                    </li>
+                  </ul>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {guide.weapons.map((w) => {
-                      const active =
-                        build.weaponGood &&
-                        (build.weaponGood.key === w.key || build.weaponInfo?.key === w.key);
+                      const own = weaponOwnership(account, character.key, w.key);
                       return (
                         <li
                           key={w.key}
-                          className={cn(
-                            "rounded-lg border px-3 py-2",
-                            panelClass(element),
-                            active && "ring-2 ring-white/35",
-                          )}
+                          className={cn("rounded-lg px-3 py-2", OWNERSHIP_ROW[own.status])}
                         >
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-sm font-medium">
-                              {weaponName(w.key)}
-                              {active ? " · на персонаже" : ""}
-                            </span>
-                            <span
-                              className={cn(
-                                "tabular-nums text-sm",
-                                element ? ELEMENT_ACCENT_TEXT[element] : "text-primary",
-                              )}
-                            >
-                              {w.relative}%
-                            </span>
+                          <div className="flex items-start gap-3">
+                            <WeaponIcon weaponKey={w.key} />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-sm font-medium">
+                                  {weaponName(w.key)}
+                                  <span className="font-normal text-muted-foreground">
+                                    {" "}
+                                    · {weaponRarity(w.key) ?? "?"}★ · {ownershipLabel(own)}
+                                  </span>
+                                </span>
+                                <span
+                                  className={cn(
+                                    "shrink-0 tabular-nums text-sm",
+                                    element ? ELEMENT_ACCENT_TEXT[element] : "text-primary",
+                                  )}
+                                >
+                                  {w.relative}%
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">{w.notes}</p>
+                              <Progress value={w.relative} className="mt-2 h-1.5" />
+                            </div>
                           </div>
-                          <p className="text-xs text-muted-foreground">{w.notes}</p>
-                          <Progress value={w.relative} className="mt-2 h-1.5" />
                         </li>
                       );
                     })}
