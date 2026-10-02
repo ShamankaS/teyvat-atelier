@@ -1,20 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { characterElement } from "@/data/character-elements";
-import { characterIconUrl } from "@/data/character-icons";
+import { characterElement, characterIconUrl } from "@/data/characters";
+import { ELEMENT_AVATAR_GRADIENT } from "@/data/element-theme";
 import { ELEMENT_LABELS } from "@/data/catalog";
 import type { ElementKey } from "@/lib/good/types";
-
-const COLORS: Record<ElementKey, string> = {
-  pyro: "from-orange-500 to-red-700",
-  hydro: "from-sky-400 to-blue-700",
-  electro: "from-violet-400 to-purple-800",
-  cryo: "from-cyan-200 to-sky-600",
-  anemo: "from-teal-300 to-emerald-700",
-  geo: "from-amber-300 to-yellow-700",
-  dendro: "from-lime-400 to-green-800",
-};
 
 const SIZE = {
   sm: "size-10 text-sm",
@@ -47,7 +37,9 @@ export function CharacterAvatar({
     .map((w) => w[0])
     .join("");
   const showImage = Boolean(src) && !failed;
-  const gradient = resolved ? COLORS[resolved] : "from-zinc-500 to-zinc-800";
+  const gradient = resolved
+    ? ELEMENT_AVATAR_GRADIENT[resolved]
+    : "from-zinc-500 to-zinc-800";
 
   return (
     <div

@@ -13,7 +13,7 @@
 | Редкость сета (3/4/5) | **GO** `artifact_set.json` → `max(rarities)` | — | `sets.ts` → `rarity` |
 | 2pc-бонус сета | Игра / wiki «Комплект» / известные значения | GO effects | `sets.ts` → `twoPc` |
 | Таблицы % оружия/сетов, капы статов | **Prydwen.gg** | KQM, TCL, community sheets | `guides.ts` |
-| Иконки / элемент (аватар) | Seelie-style / локальные карты | — | `character-icons.ts`, `character-elements.ts` |
+| Иконки / элемент (аватар) | Enka suffix в каталоге | — | `characters.ts` → `icon`, `element` |
 
 Не брать RU-локализацию с **Fandom / Honey Hunter** — только официальная HoYoWiki.
 
@@ -112,13 +112,12 @@ cd genshin-optimizer && git sparse-checkout set libs/gi/stats/Data/Weapons libs/
 
 | Файл | Содержимое |
 |------|------------|
-| `src/data/characters.ts` | GOOD key → имя, элемент, тип оружия, `baseHp90` / `baseAtk90` / `baseDef90` |
+| `src/data/characters.ts` | GOOD key → имя, элемент, тип оружия, `rarity`, Enka `icon`, `baseHp90` / `baseAtk90` / `baseDef90` |
 | `src/data/weapons.ts` | GOOD key → имя, тип, rarity, `baseAtk90`, substat |
 | `src/data/sets.ts` | GOOD key → имя, `rarity` (max), опционально `twoPc` |
 | `src/data/guides.ts` | таблицы % и капы для guided-персонажей |
 | `src/data/catalog.ts` | только лейблы статов / элементов / типов оружия |
-| `src/data/character-icons.ts` | URL аватар |
-| `src/data/character-elements.ts` | элемент для UI, если нужен отдельно |
+| `src/data/element-theme.ts` | Цвета стихий для аватара, hero и фона страницы |
 
 Формат хранения — **TypeScript** (типы + хелперы `characterName` / `weaponName` / `setName`).
 
@@ -128,7 +127,7 @@ cd genshin-optimizer && git sparse-checkout set libs/gi/stats/Data/Weapons libs/
 
 1. GOOD-ключ совпадает с экспортом Irminsul/GO.  
 2. RU-имя свернуть с HoYoWiki aggregate.  
-3. Статы L90: GO → иначе wiki «Возвысить».  
+3. Статы L90: GO → иначе wiki «Возвысить»; `rarity` и Enka `icon` suffix.  
 4. Для сета: `rarity = max(rarities)`; `twoPc` только если бонус мапится в наши статы (`StatKey` / skill / burst / na).  
 5. Для гайда: Prydwen URL + таблица; ключи оружия/сетов уже есть в `weapons.ts` / `sets.ts`.  
 6. `tsc --noEmit` без ошибок.

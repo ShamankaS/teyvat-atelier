@@ -1,7 +1,7 @@
 import { CHARACTERS, type CharacterInfo } from "@/data/characters";
 import { SETS } from "@/data/sets";
 import { WEAPONS, type WeaponInfo } from "@/data/weapons";
-import type { GoodAccount, GoodArtifact, GoodCharacter } from "@/lib/good/types";
+import type { GoodAccount, GoodArtifact, GoodCharacter, GoodWeapon } from "@/lib/good/types";
 import { mainstatValue } from "@/lib/stats";
 
 const WEAPON_ALIASES: Record<string, string> = {
@@ -15,6 +15,55 @@ const WEAPON_ALIASES: Record<string, string> = {
 
 export function resolveWeapon(key: string): WeaponInfo | undefined {
   return WEAPONS[key] ?? WEAPONS[WEAPON_ALIASES[key]] ?? WEAPONS[key.replace(/sBane/, "Bane")];
+}
+
+/** Canonical key for matching GOOD weapon aliases across catalog duplicates. */
+export function weaponCanonicalKey(key: string): string {
+  return WEAPON_ALIASES[key] ?? resolveWeapon(key)?.key ?? key;
+}
+
+export type WeaponOwnership =
+  | { status: "equipped"; refinement: number }
+  | { status: "owned"; refinement: number }
+  | { status: "elsewhere"; refinement: number; location: string }
+  | { status: "missing" };
+
+function matchesWeaponKey(weaponKey: string, guideKey: string): boolean {
+  return weaponCanonicalKey(weaponKey) === weaponCanonicalKey(guideKey);
+}
+
+/**
+ * How a guide weapon appears in the loaded GOOD account for this character.
+ * Priority when several copies exist: equipped → owned (unequipped) → elsewhere → missing.
+ */
+export function weaponOwnership(
+  account: GoodAccount,
+  characterKey: string,
+  guideWeaponKey: string,
+): WeaponOwnership {
+  const copies = account.weapons.filter((w) => matchesWeaponKey(w.key, guideWeaponKey));
+  if (copies.length === 0) return { status: "missing" };
+
+  const equipped = copies.find((w) => w.location === characterKey);
+  if (equipped) return { status: "equipped", refinement: equipped.refinement };
+
+  const owned = copies.find((w) => !w.location);
+  if (owned) return { status: "owned", refinement: owned.refinement };
+
+  const elsewhere = copies.reduce<GoodWeapon | undefined>((best, w) => {
+    if (!w.location || w.location === characterKey) return best;
+    if (!best || w.refinement > best.refinement) return w;
+    return best;
+  }, undefined);
+  if (elsewhere?.location) {
+    return {
+      status: "elsewhere",
+      refinement: elsewhere.refinement,
+      location: elsewhere.location,
+    };
+  }
+
+  return { status: "missing" };
 }
 
 export interface BuiltStats {
