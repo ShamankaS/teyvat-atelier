@@ -3,11 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Star } from "lucide-react";
-import { CHARACTERS, characterName } from "@/data/characters";
+import { CHARACTERS, characterName, characterSplashUrl } from "@/data/characters";
 import { setName } from "@/data/sets";
 import { weaponName } from "@/data/weapons";
 import { ELEMENT_LABELS, WEAPON_TYPE_LABELS, statLabel } from "@/data/catalog";
-import { characterSplashUrl } from "@/data/character-icons";
 import {
   ELEMENT_ACCENT_TEXT,
   ELEMENT_HERO_BORDER,

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { characterElement } from "@/data/character-elements";
-import { characterIconUrl } from "@/data/character-icons";
+import { characterElement, characterIconUrl } from "@/data/characters";
 import { ELEMENT_AVATAR_GRADIENT } from "@/data/element-theme";
 import { ELEMENT_LABELS } from "@/data/catalog";
 import type { ElementKey } from "@/lib/good/types";
