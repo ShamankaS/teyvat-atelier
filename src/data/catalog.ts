@@ -229,7 +229,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   CrimsonMoonsSemblance: {
     key: "CrimsonMoonsSemblance",
-    name: "Очертание алой луны",
+    name: "Очертания алой луны",
     type: "polearm",
     rarity: 5,
     baseAtk90: 674,
@@ -418,7 +418,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   PrimordialJadeCutter: {
     key: "PrimordialJadeCutter",
-    name: "Драгоценный клинок",
+    name: "Драгоценный омут",
     type: "sword",
     rarity: 5,
     baseAtk90: 542,
@@ -445,7 +445,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   HaranGeppakuFutsu: {
     key: "HaranGeppakuFutsu",
-    name: "Харан Гэппаку Фуцу",
+    name: "Харан гэппаку фуцу",
     type: "sword",
     rarity: 5,
     baseAtk90: 608,
@@ -463,7 +463,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   Absolution: {
     key: "Absolution",
-    name: "Отречение",
+    name: "Отпущение грехов",
     type: "sword",
     rarity: 5,
     baseAtk90: 674,
@@ -544,7 +544,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   SapwoodBlade: {
     key: "SapwoodBlade",
-    name: "Клинок из древесины",
+    name: "Деревянный клинок",
     type: "sword",
     rarity: 4,
     baseAtk90: 565,
@@ -571,7 +571,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   AquilaFavonia: {
     key: "AquilaFavonia",
-    name: "Меч сокола",
+    name: "Меч Сокола",
     type: "sword",
     rarity: 5,
     baseAtk90: 674,
@@ -589,7 +589,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   TomeOfTheEternalFlow: {
     key: "TomeOfTheEternalFlow",
-    name: "Свидетельство вечного течения",
+    name: "Обряд вечного течения",
     type: "catalyst",
     rarity: 5,
     baseAtk90: 542,
@@ -634,7 +634,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   SacrificialJade: {
     key: "SacrificialJade",
-    name: "Церемониальный нефрит",
+    name: "Жертвенный нефрит",
     type: "catalyst",
     rarity: 4,
     baseAtk90: 454,
@@ -760,7 +760,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   AThousandBlazingSuns: {
     key: "AThousandBlazingSuns",
-    name: "Тысяча пылающих солнц",
+    name: "Тысяча ослепительных солнц",
     type: "claymore",
     rarity: 5,
     baseAtk90: 741,
@@ -796,7 +796,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   PortablePowerSaw: {
     key: "PortablePowerSaw",
-    name: "Переносная пила",
+    name: "Переносная мотопила",
     type: "claymore",
     rarity: 4,
     baseAtk90: 454,
@@ -823,7 +823,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   TidalShadow: {
     key: "TidalShadow",
-    name: "Тень прилива",
+    name: "Тень волны",
     type: "claymore",
     rarity: 4,
     baseAtk90: 510,
@@ -859,7 +859,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   AmosBow: {
     key: "AmosBow",
-    name: "Лук Амоса",
+    name: "Лук Амос",
     type: "bow",
     rarity: 5,
     baseAtk90: 608,
@@ -868,7 +868,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   AthameArtis: {
     key: "AthameArtis",
-    name: "Атаме Артис",
+    name: "Атаме артис",
     type: "sword",
     rarity: 5,
     baseAtk90: 608,
@@ -886,7 +886,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   CashflowSupervision: {
     key: "CashflowSupervision",
-    name: "Кассовый надзор",
+    name: "Казначейский надзор",
     type: "catalyst",
     rarity: 5,
     baseAtk90: 674,
@@ -904,7 +904,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   DialoguesOfTheDesertSages: {
     key: "DialoguesOfTheDesertSages",
-    name: "Беседы пустынных мудрецов",
+    name: "Диалог пустынных мудрецов",
     type: "polearm",
     rarity: 4,
     baseAtk90: 510,
@@ -931,7 +931,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   FlameForgedInsight: {
     key: "FlameForgedInsight",
-    name: "Выкованная в пламени мысль",
+    name: "Выкованное пламенем озарение",
     type: "claymore",
     rarity: 4,
     baseAtk90: 510,
@@ -940,7 +940,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   FracturedHalo: {
     key: "FracturedHalo",
-    name: "Расколотый нимб",
+    name: "Расколотый ореол",
     type: "catalyst",
     rarity: 5,
     baseAtk90: 608,
@@ -949,7 +949,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   GestOfTheMightyWolf: {
     key: "GestOfTheMightyWolf",
-    name: "Жест могучего волка",
+    name: "Подвиг могучего волка",
     type: "claymore",
     rarity: 5,
     baseAtk90: 741,
@@ -1003,7 +1003,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   NightweaversLookingGlass: {
     key: "NightweaversLookingGlass",
-    name: "Зеркало ткачихи ночи",
+    name: "Зеркало прядильщицы ночи",
     type: "catalyst",
     rarity: 5,
     baseAtk90: 542,
@@ -1012,7 +1012,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   NocturnesCurtainCall: {
     key: "NocturnesCurtainCall",
-    name: "Занавес ноктюрна",
+    name: "Вызов ноктюрна",
     type: "catalyst",
     rarity: 5,
     baseAtk90: 542,
@@ -1021,7 +1021,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   RainbowSerpentsRainBow: {
     key: "RainbowSerpentsRainBow",
-    name: "Радужный лук змея",
+    name: "Струны дождя радужного змея",
     type: "bow",
     rarity: 4,
     baseAtk90: 510,
@@ -1075,7 +1075,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   StarcallersWatch: {
     key: "StarcallersWatch",
-    name: "Дозор призывательницы звёзд",
+    name: "Бдение взывающего к звёздам",
     type: "catalyst",
     rarity: 5,
     baseAtk90: 542,
@@ -1102,7 +1102,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   TheDockhandsAssistant: {
     key: "TheDockhandsAssistant",
-    name: "Помощник портового рабочего",
+    name: "Верфь",
     type: "sword",
     rarity: 4,
     baseAtk90: 510,
@@ -1138,7 +1138,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   UltimateOverlordsMegaMagicSword: {
     key: "UltimateOverlordsMegaMagicSword",
-    name: "Мегамагический меч высшего лорда",
+    name: "«Магический супермеч высшего владыки»",
     type: "claymore",
     rarity: 4,
     baseAtk90: 565,
@@ -1147,7 +1147,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   VividNotions: {
     key: "VividNotions",
-    name: "Яркие грёзы",
+    name: "Переливающиеся чаяния",
     type: "catalyst",
     rarity: 5,
     baseAtk90: 674,
@@ -1156,7 +1156,7 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
   Whiteblind: {
     key: "Whiteblind",
-    name: "Белая слепота",
+    name: "Белая тень",
     type: "claymore",
     rarity: 4,
     baseAtk90: 510,
@@ -1189,10 +1189,10 @@ export const SET_NAMES: Record<string, string> = {
   DesertPavilionChronicle: "Хроники Чертогов в пустыне",
   VourukashasGlow: "Сияние Вурукаши",
   NymphsDream: "Сон нимфы",
-  NighttimeWhispersInTheEchoingWoods: "Ночной шёпот в лесу отголосков",
+  NighttimeWhispersInTheEchoingWoods: "Ночной шёпот в Лесу откликающегося эха",
   FragmentOfHarmonicWhimsy: "Фрагмент гармонической фантазии",
-  UnfinishedReverie: "Незаконченная грёза",
-  ObsidianCodex: "Обсидиановый кодекс",
+  UnfinishedReverie: "Незаконченные грёзы",
+  ObsidianCodex: "Обсидиановый фолиант",
   ScrollOfTheHeroOfCinderCity: "Свиток героя сожжённого города",
   Instructor: "Инструктор",
   TheExile: "Изгнанник",
@@ -1204,13 +1204,13 @@ export const SET_NAMES: Record<string, string> = {
   HuskOfOpulentDreams: "Кокон сладких грёз",
   PaleFlame: "Бледный огонь",
   LongNightsOath: "Клятва долгой ночи",
-  FinaleOfTheDeepGalleries: "Финал глубоких галерей",
+  FinaleOfTheDeepGalleries: "Финал галерей глубин",
   Whimsy: "Фрагмент гармонической фантазии",
-  ADayCarvedFromRisingWinds: "День, вырезанный из восходящих ветров",
-  AubadeOfMorningstarAndMoon: "Аубада утренней звезды и луны",
+  ADayCarvedFromRisingWinds: "День восходящих ветров",
+  AubadeOfMorningstarAndMoon: "Рассветная песнь звезды и луны",
   BloodstainedChivalry: "Рыцарь крови",
-  NightOfTheSkysUnveiling: "Ночь раскрытия небес",
-  SilkenMoonsSerenade: "Серенада шелковой луны",
+  NightOfTheSkysUnveiling: "Ночь открытия неба",
+  SilkenMoonsSerenade: "Серенада шёлковой луны",
 };
 
 export const TWO_PC_STATS: Record<string, { key: StatKey | "skill" | "burst" | "na"; value: number }> = {

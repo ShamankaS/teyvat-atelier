@@ -94,7 +94,11 @@ export function RosterGrid() {
               className="group rounded-2xl border border-white/10 bg-white/4 p-4 transition hover:border-primary/40 hover:bg-white/8"
             >
               <div className="flex items-center gap-3">
-                <CharacterAvatar name={name} element={a.build.info?.element} />
+                <CharacterAvatar
+                  characterKey={a.character.key}
+                  name={name}
+                  element={a.build.info?.element}
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="truncate font-medium">{name}</p>
