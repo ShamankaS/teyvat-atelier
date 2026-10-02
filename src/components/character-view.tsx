@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatStatValue } from "@/lib/stats";
+import { weaponOwnership, type WeaponOwnership } from "@/lib/compute";
 import type { Analysis } from "@/lib/analyze";
 
 const KIND_LABEL = {
@@ -25,6 +26,27 @@ const KIND_LABEL = {
   level: "Уровень",
   cap: "Кап стата",
 };
+
+const OWNERSHIP_ROW: Record<WeaponOwnership["status"], string> = {
+  equipped: "bg-primary/15 ring-1 ring-primary/40",
+  owned: "bg-emerald-500/10 ring-1 ring-emerald-500/30",
+  elsewhere: "bg-amber-500/10 ring-1 ring-amber-500/35",
+  missing: "bg-white/3 opacity-60",
+};
+
+function ownershipLabel(own: WeaponOwnership): string {
+  switch (own.status) {
+    case "equipped":
+      return `на персонаже · R${own.refinement}`;
+    case "owned":
+      return `в аккаунте · R${own.refinement}`;
+    case "elsewhere":
+      return `на ${characterName(own.location)} · R${own.refinement}`;
+    case "missing":
+      return "нет в аккаунте";
+  }
+}
+
 
 function Suggestions({ analysis }: { analysis: Analysis }) {
   if (analysis.suggestions.length === 0) {
@@ -295,22 +317,38 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                 <CardHeader>
                   <CardTitle>Оружие относительно BiS</CardTitle>
                   <CardDescription>{guide.scenario}</CardDescription>
+                  <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    <li className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-primary" aria-hidden />
+                      на персонаже
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-emerald-400" aria-hidden />
+                      в аккаунте
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-amber-400" aria-hidden />
+                      на другом
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-white/30" aria-hidden />
+                      нет в аккаунте
+                    </li>
+                  </ul>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {guide.weapons.map((w) => {
-                      const active =
-                        build.weaponGood &&
-                        (build.weaponGood.key === w.key || build.weaponInfo?.key === w.key);
+                      const own = weaponOwnership(account, character.key, w.key);
                       return (
-                        <li
-                          key={w.key}
-                          className={`rounded-lg px-3 py-2 ${active ? "bg-primary/15 ring-1 ring-primary/40" : "bg-white/4"}`}
-                        >
+                        <li key={w.key} className={`rounded-lg px-3 py-2 ${OWNERSHIP_ROW[own.status]}`}>
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-sm font-medium">
                               {weaponName(w.key)}
-                              {active ? " · на персонаже" : ""}
+                              <span className="font-normal text-muted-foreground">
+                                {" "}
+                                · {ownershipLabel(own)}
+                              </span>
                             </span>
                             <span className="tabular-nums text-sm text-primary">{w.relative}%</span>
                           </div>
