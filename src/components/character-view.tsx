@@ -37,25 +37,17 @@ const KIND_LABEL = {
   cap: "Кап стата",
 };
 
-/** Ownership chrome tuned for element-tinted surfaces (not primary/sky which clash). */
+/** Three visual tiers on element-tinted cards: equipped (accent) → owned → missing (dim). */
 const OWNERSHIP_ROW: Record<WeaponOwnership["status"], string> = {
-  equipped: "border-2 border-white/85 bg-black/40",
-  owned: "border border-emerald-300/55 bg-emerald-950/60",
-  elsewhere: "border border-rose-400/55 bg-rose-950/55",
-  missing: "border border-white/10 bg-black/45 opacity-55",
+  equipped: "bg-white/18 ring-2 ring-white/80",
+  owned: "bg-white/6",
+  elsewhere: "bg-white/6",
+  missing: "opacity-40",
 };
 
-function ownershipLabel(own: WeaponOwnership): string {
-  switch (own.status) {
-    case "equipped":
-      return `на персонаже · R${own.refinement}`;
-    case "owned":
-      return `в аккаунте · R${own.refinement}`;
-    case "elsewhere":
-      return `на ${characterName(own.location)} · R${own.refinement}`;
-    case "missing":
-      return "нет в аккаунте";
-  }
+function ownershipMeta(own: WeaponOwnership): string {
+  if (own.status === "missing") return "нет";
+  return `R${own.refinement}`;
 }
 
 function RarityStars({ rarity }: { rarity: 4 | 5 }) {
@@ -443,29 +435,22 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
         <TabsContent value="guide">
           {guide ? (
             <div className="grid gap-4 lg:grid-cols-2">
-                            <ThemedCard element={element}>
+            <ThemedCard element={element}>
                 <CardHeader>
                   <CardTitle>Оружие относительно BiS</CardTitle>
                   <CardDescription>{guide.scenario}</CardDescription>
                   <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                     <li className="flex items-center gap-1.5">
-                      <span
-                        className="size-2.5 rounded-[2px] border-2 border-white/85 bg-black/40"
-                        aria-hidden
-                      />
-                      на персонаже
+                      <span className="size-2.5 rounded-[3px] bg-white/25 ring-2 ring-white/80" aria-hidden />
+                      одето
                     </li>
                     <li className="flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-emerald-300" aria-hidden />
-                      в аккаунте
+                      <span className="size-2 rounded-full bg-white/35" aria-hidden />
+                      есть
                     </li>
                     <li className="flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-rose-400" aria-hidden />
-                      на другом
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-white/25" aria-hidden />
-                      нет в аккаунте
+                      <span className="size-2 rounded-full bg-white/15 opacity-50" aria-hidden />
+                      нет
                     </li>
                   </ul>
                 </CardHeader>
@@ -473,6 +458,7 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                   <ul className="space-y-2">
                     {guide.weapons.map((w) => {
                       const own = weaponOwnership(account, character.key, w.key);
+                      const holderKey = own.status === "elsewhere" ? own.location : undefined;
                       return (
                         <li
                           key={w.key}
@@ -482,21 +468,35 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                             <WeaponIcon weaponKey={w.key} />
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-sm font-medium">
+                                <span className="min-w-0 text-sm font-medium">
                                   {weaponName(w.key)}
                                   <span className="font-normal text-muted-foreground">
                                     {" "}
-                                    · {weaponRarity(w.key) ?? "?"}★ · {ownershipLabel(own)}
+                                    · {weaponRarity(w.key) ?? "?"}★ · {ownershipMeta(own)}
                                   </span>
                                 </span>
-                                <span
-                                  className={cn(
-                                    "shrink-0 tabular-nums text-sm",
-                                    element ? ELEMENT_ACCENT_TEXT[element] : "text-primary",
-                                  )}
-                                >
-                                  {w.relative}%
-                                </span>
+                                <div className="flex shrink-0 items-center gap-2">
+                                  {holderKey ? (
+                                    <CharacterAvatar
+                                      characterKey={holderKey}
+                                      name={characterName(holderKey)}
+                                      size="sm"
+                                    />
+                                  ) : null}
+                                  <span
+                                    className={cn(
+                                      "tabular-nums text-sm",
+                                      own.status === "equipped"
+                                        ? element
+                                          ? ELEMENT_ACCENT_TEXT[element]
+                                          : "text-primary"
+                                        : "text-muted-foreground",
+                                      own.status === "equipped" && "font-semibold",
+                                    )}
+                                  >
+                                    {w.relative}%
+                                  </span>
+                                </div>
                               </div>
                               <p className="text-xs text-muted-foreground">{w.notes}</p>
                               <Progress value={w.relative} className="mt-2 h-1.5" />
