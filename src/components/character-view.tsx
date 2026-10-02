@@ -31,7 +31,7 @@ const KIND_LABEL = {
 const OWNERSHIP_ROW: Record<WeaponOwnership["status"], string> = {
   equipped: "bg-primary/15 ring-1 ring-primary/40",
   owned: "bg-emerald-500/10 ring-1 ring-emerald-500/30",
-  elsewhere: "bg-amber-500/10 ring-1 ring-amber-500/35",
+  elsewhere: "bg-sky-500/10 ring-1 ring-sky-400/40",
   missing: "bg-white/3 opacity-60",
 };
 
@@ -328,7 +328,7 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                       в аккаунте
                     </li>
                     <li className="flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-amber-400" aria-hidden />
+                      <span className="size-2 rounded-full bg-sky-400" aria-hidden />
                       на другом
                     </li>
                     <li className="flex items-center gap-1.5">
