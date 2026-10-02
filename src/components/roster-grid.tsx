@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { characterName } from "@/data/catalog";
+import { characterName } from "@/data/characters";
 import { GUIDES } from "@/data/guides";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { ScoreRing } from "@/components/score-ring";

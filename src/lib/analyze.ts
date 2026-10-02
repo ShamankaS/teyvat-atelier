@@ -1,5 +1,8 @@
 import { GUIDES, type CharacterGuide, type SetRank, type WeaponRank } from "@/data/guides";
-import { characterName, setName, statLabel, weaponName } from "@/data/catalog";
+import { characterName } from "@/data/characters";
+import { setName } from "@/data/sets";
+import { weaponName } from "@/data/weapons";
+import { statLabel } from "@/data/catalog";
 import type { GoodAccount, GoodCharacter, StatKey } from "@/lib/good/types";
 import {
   computeBuild,

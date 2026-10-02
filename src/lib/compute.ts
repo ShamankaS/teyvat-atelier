@@ -1,16 +1,16 @@
-import {
-  CHARACTERS,
-  TWO_PC_STATS,
-  WEAPONS,
-  type CharacterInfo,
-  type WeaponInfo,
-} from "@/data/catalog";
+import { CHARACTERS, type CharacterInfo } from "@/data/characters";
+import { SETS } from "@/data/sets";
+import { WEAPONS, type WeaponInfo } from "@/data/weapons";
 import type { GoodAccount, GoodArtifact, GoodCharacter } from "@/lib/good/types";
 import { mainstatValue } from "@/lib/stats";
 
 const WEAPON_ALIASES: Record<string, string> = {
   DragonsBane: "DragonBane",
   DragonBane: "DragonBane",
+  WolfsGravestone: "WolfsGravestone",
+  WolfGravestone: "WolfsGravestone",
+  TheStringless: "TheStringless",
+  Stringless: "TheStringless",
 };
 
 export function resolveWeapon(key: string): WeaponInfo | undefined {
@@ -159,11 +159,14 @@ export function computeBuild(
   const counts = setCounts(artifacts);
   for (const [set, n] of Object.entries(counts)) {
     if (n < 2) continue;
-    const bonus = TWO_PC_STATS[set];
+    const bonus = SETS[set]?.twoPc;
     if (!bonus) continue;
     if (bonus.key === "hp_") hpPercent.push(bonus.value);
     else if (bonus.key === "atk_") atkPercent.push(bonus.value);
     else if (bonus.key === "def_") defPercent.push(bonus.value);
+    else if (bonus.key === "hp") stats.hp += bonus.value;
+    else if (bonus.key === "atk") stats.atk += bonus.value;
+    else if (bonus.key === "def") stats.def += bonus.value;
     else if (bonus.key !== "skill" && bonus.key !== "burst" && bonus.key !== "na") {
       addFlat(stats, bonus.key, bonus.value);
     }
