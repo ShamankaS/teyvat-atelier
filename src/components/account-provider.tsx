@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -33,7 +34,6 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<GoodAccount | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [started, setStarted] = useState(false);
 
   const applyText = useCallback((text: string) => {
     const parsed = parseAccountJson(text);
@@ -65,10 +65,9 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     }
   }, [applyText]);
 
-  if (!started) {
-    setStarted(true);
+  useEffect(() => {
     void loadMyAccount();
-  }
+  }, [loadMyAccount]);
 
   const loadJson = useCallback(
     (text: string) => {

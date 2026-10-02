@@ -1,0 +1,22 @@
+---
+description: Official Russian localization sources for Genshin names (Hoyolab Wiki)
+alwaysApply: true
+---
+
+# Hoyolab localization (RU)
+
+When adding or correcting Russian display names, use **HoYoWiki** (official), not fandom wiki:
+
+| Type | URL |
+|------|-----|
+| Characters | https://wiki.hoyolab.com/pc/genshin/aggregate/2 |
+| Weapons | https://wiki.hoyolab.com/pc/genshin/aggregate/4 |
+| Artifacts (sets) | https://wiki.hoyolab.com/pc/genshin/aggregate/5 |
+
+API (lang `ru-ru`): `POST https://sg-wiki-api.hoyolab.com/hoyowiki/genshin/wapi/get_entry_page_list` with `menu_id` `2` / `4` / `5`, headers `x-rpc-language: ru-ru` and `x-rpc-wiki_app: genshin`.
+
+- Character names → `src/data/names.ts` (`CHARACTER_NAMES`)
+- Weapon names → `src/data/catalog.ts` (`WEAPONS[].name`)
+- Set names → `src/data/catalog.ts` (`SET_NAMES`)
+
+Do not add Manekin/Manekina to the app; they stay filtered out on GOOD import.

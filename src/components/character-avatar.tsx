@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { characterElement } from "@/data/character-elements";
+import { characterIconUrl } from "@/data/character-icons";
 import { ELEMENT_LABELS } from "@/data/catalog";
 import type { ElementKey } from "@/lib/good/types";
 
@@ -11,27 +16,59 @@ const COLORS: Record<ElementKey, string> = {
   dendro: "from-lime-400 to-green-800",
 };
 
+const SIZE = {
+  sm: "size-10 text-sm",
+  md: "size-12 text-base",
+  lg: "size-16 text-xl",
+} as const;
+
 export function CharacterAvatar({
+  characterKey,
   name,
   element,
   size = "md",
 }: {
+  characterKey?: string;
   name: string;
   element?: ElementKey;
   size?: "sm" | "md" | "lg";
 }) {
-  const dim = size === "sm" ? "size-10 text-sm" : size === "lg" ? "size-16 text-xl" : "size-12 text-base";
+  const src = characterKey ? characterIconUrl(characterKey) : null;
+  const resolved = element ?? (characterKey ? characterElement(characterKey) : undefined);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
   const letters = name
     .split(" ")
     .slice(0, 2)
     .map((w) => w[0])
     .join("");
+  const showImage = Boolean(src) && !failed;
+  const gradient = resolved ? COLORS[resolved] : "from-zinc-500 to-zinc-800";
+
   return (
     <div
-      className={`relative flex ${dim} items-center justify-center rounded-full bg-linear-to-br font-semibold text-white shadow-inner ${element ? COLORS[element] : "from-zinc-500 to-zinc-800"}`}
-      title={element ? ELEMENT_LABELS[element] : name}
+      className={`relative flex ${SIZE[size]} shrink-0 items-center justify-center overflow-hidden rounded-full bg-linear-to-br font-semibold text-white shadow-inner ${gradient}`}
+      title={resolved ? ELEMENT_LABELS[resolved] : name}
     >
-      {letters}
+      {showImage ? (
+        // Enka CDN portraits — circular crop like seelie.me character icons
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src!}
+          alt=""
+          className="size-full object-cover object-[center_20%]"
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span aria-hidden>{letters}</span>
+      )}
+      <span className="sr-only">{name}</span>
     </div>
   );
 }

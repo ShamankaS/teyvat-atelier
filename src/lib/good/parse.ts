@@ -58,6 +58,12 @@ function asArtifact(raw: unknown): GoodArtifact | null {
   };
 }
 
+const HIDDEN_CHARACTERS = new Set(["Manekin", "Manekina"]);
+
+function isHiddenCharacter(key: string) {
+  return HIDDEN_CHARACTERS.has(key);
+}
+
 function remapTraveler(account: GoodAccount) {
   const travelers = account.characters.filter((c) => c.key.startsWith("Traveler"));
   if (travelers.length !== 1) return;
@@ -67,6 +73,17 @@ function remapTraveler(account: GoodAccount) {
   }
   for (const a of account.artifacts) {
     if (a.location === "Traveler") a.location = dest;
+  }
+}
+
+/** Drop mannequins / practice characters — they are not real roster entries. */
+function stripHiddenCharacters(account: GoodAccount) {
+  account.characters = account.characters.filter((c) => !isHiddenCharacter(c.key));
+  for (const w of account.weapons) {
+    if (isHiddenCharacter(w.location)) w.location = "";
+  }
+  for (const a of account.artifacts) {
+    if (isHiddenCharacter(a.location)) a.location = "";
   }
 }
 
@@ -109,5 +126,9 @@ export function parseAccount(raw: unknown): { account: GoodAccount } | { error: 
     artifacts,
   };
   remapTraveler(account);
+  stripHiddenCharacters(account);
+  if (account.characters.length === 0) {
+    return { error: "В JSON нет персонажей." };
+  }
   return { account };
 }
