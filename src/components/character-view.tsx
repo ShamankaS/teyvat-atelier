@@ -29,7 +29,7 @@ const KIND_LABEL = {
 };
 
 const OWNERSHIP_ROW: Record<WeaponOwnership["status"], string> = {
-  equipped: "bg-primary/15 ring-1 ring-primary/40",
+  equipped: "border-2 border-primary bg-primary/10",
   owned: "bg-emerald-500/10 ring-1 ring-emerald-500/30",
   elsewhere: "bg-sky-500/10 ring-1 ring-sky-400/40",
   missing: "bg-white/3 opacity-60",
@@ -320,7 +320,10 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                   <CardDescription>{guide.scenario}</CardDescription>
                   <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                     <li className="flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-primary" aria-hidden />
+                      <span
+                        className="size-2.5 rounded-[2px] border-2 border-primary bg-primary/20"
+                        aria-hidden
+                      />
                       на персонаже
                     </li>
                     <li className="flex items-center gap-1.5">
