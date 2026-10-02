@@ -112,12 +112,13 @@ cd genshin-optimizer && git sparse-checkout set libs/gi/stats/Data/Weapons libs/
 
 | Файл | Содержимое |
 |------|------------|
-| `src/data/characters.ts` | GOOD key → имя, элемент, тип оружия, `baseHp90` / `baseAtk90` / `baseDef90` |
+| `src/data/characters.ts` | GOOD key → имя, элемент, тип оружия, `rarity` (4/5), `baseHp90` / `baseAtk90` / `baseDef90` |
 | `src/data/weapons.ts` | GOOD key → имя, тип, rarity, `baseAtk90`, substat |
 | `src/data/sets.ts` | GOOD key → имя, `rarity` (max), опционально `twoPc` |
 | `src/data/guides.ts` | таблицы % и капы для guided-персонажей |
 | `src/data/catalog.ts` | только лейблы статов / элементов / типов оружия |
-| `src/data/character-icons.ts` | URL аватар |
+| `src/data/character-icons.ts` | URL аватара и gacha splash (Enka) |
+| `src/data/element-theme.ts` | Цвета стихий для аватара, hero и фона страницы |
 | `src/data/character-elements.ts` | элемент для UI, если нужен отдельно |
 
 Формат хранения — **TypeScript** (типы + хелперы `characterName` / `weaponName` / `setName`).

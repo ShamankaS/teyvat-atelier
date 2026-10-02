@@ -1,11 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { characterName } from "@/data/characters";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Star } from "lucide-react";
+import { CHARACTERS, characterName } from "@/data/characters";
 import { setName } from "@/data/sets";
 import { weaponName } from "@/data/weapons";
-import { statLabel } from "@/data/catalog";
+import { ELEMENT_LABELS, WEAPON_TYPE_LABELS, statLabel } from "@/data/catalog";
+import { characterSplashUrl } from "@/data/character-icons";
+import {
+  ELEMENT_ACCENT_TEXT,
+  ELEMENT_HERO_BORDER,
+  ELEMENT_HERO_WASH,
+} from "@/data/element-theme";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { ScoreRing } from "@/components/score-ring";
 import { useAccount } from "@/components/account-provider";
@@ -15,6 +22,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatStatValue } from "@/lib/stats";
+import { cn } from "@/lib/utils";
 import type { Analysis } from "@/lib/analyze";
 
 const KIND_LABEL = {
@@ -25,6 +33,52 @@ const KIND_LABEL = {
   level: "Уровень",
   cap: "Кап стата",
 };
+
+function RarityStars({ rarity }: { rarity: 4 | 5 }) {
+  return (
+    <div className="flex items-center gap-0.5" aria-label={`${rarity}★`}>
+      {Array.from({ length: rarity }, (_, i) => (
+        <Star
+          key={i}
+          className="size-3.5 fill-amber-300 text-amber-300"
+          aria-hidden
+        />
+      ))}
+    </div>
+  );
+}
+
+function CharacterSplash({ characterKey }: { characterKey: string }) {
+  const src = characterSplashUrl(characterKey);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
+  if (!src || failed) return null;
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-y-0 right-0 hidden w-[48%] overflow-hidden sm:block"
+      aria-hidden
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        className="h-full w-full object-cover object-[center_15%] opacity-90"
+        style={{
+          maskImage: "linear-gradient(to left, black 35%, transparent 95%)",
+          WebkitMaskImage: "linear-gradient(to left, black 35%, transparent 95%)",
+        }}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  );
+}
 
 function Suggestions({ analysis }: { analysis: Analysis }) {
   if (analysis.suggestions.length === 0) {
@@ -94,6 +148,10 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
 
   const { character, guide, build } = analysis;
   const name = characterName(character.key);
+  const info = build.info ?? CHARACTERS[character.key];
+  const element = info?.element;
+  const weaponType = info?.weaponType;
+  const rarity = info?.rarity;
   const slots = ["flower", "plume", "sands", "goblet", "circlet"] as const;
   const slotRu = {
     flower: "Цветок",
@@ -110,33 +168,78 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
         Все персонажи
       </Link>
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/4 p-5 sm:flex-row sm:items-center">
-        <CharacterAvatar
-          characterKey={character.key}
-          name={name}
-          element={build.info?.element}
-          size="lg"
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-2xl border bg-white/4 p-5",
+          element ? ELEMENT_HERO_BORDER[element] : "border-white/10",
+        )}
+      >
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-0 bg-linear-to-br",
+            element ? ELEMENT_HERO_WASH[element] : "from-white/5 via-transparent to-transparent",
+          )}
+          aria-hidden
         />
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-semibold">{name}</h1>
-            <Badge>C{character.constellation}</Badge>
-            {guide ? <Badge variant="secondary">{guide.role}</Badge> : null}
+        <CharacterSplash characterKey={character.key} />
+
+        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <CharacterAvatar
+            characterKey={character.key}
+            name={name}
+            element={element}
+            size="lg"
+          />
+          <div className="min-w-0 flex-1 sm:pr-[42%]">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight">{name}</h1>
+              <Badge>C{character.constellation}</Badge>
+              {guide ? <Badge variant="secondary">{guide.role}</Badge> : null}
+            </div>
+            {rarity ? (
+              <div className="mt-1.5">
+                <RarityStars rarity={rarity} />
+              </div>
+            ) : null}
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {element ? (
+                <Badge
+                  variant="outline"
+                  className={cn("bg-black/20", ELEMENT_ACCENT_TEXT[element])}
+                >
+                  {ELEMENT_LABELS[element]}
+                </Badge>
+              ) : null}
+              {weaponType ? (
+                <Badge variant="outline" className="bg-black/20">
+                  {WEAPON_TYPE_LABELS[weaponType]}
+                </Badge>
+              ) : null}
+              {rarity ? (
+                <Badge variant="outline" className="bg-black/20">
+                  {rarity}★
+                </Badge>
+              ) : null}
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Ур. {character.level} · {character.talent.auto}/{character.talent.skill}/
+              {character.talent.burst}
+              {guide ? ` · пачка: ${guide.team}` : null}
+            </p>
+            {guide ? (
+              <p className="mt-2 max-w-xl text-sm text-muted-foreground">{guide.notes}</p>
+            ) : null}
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ур. {character.level} · {character.talent.auto}/{character.talent.skill}/{character.talent.burst}
-            {guide ? ` · пачка: ${guide.team}` : null}
-          </p>
-          {guide ? (
-            <p className="mt-2 text-sm text-muted-foreground">{guide.notes}</p>
-          ) : null}
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right text-sm">
-            <p className="text-muted-foreground">Оценка билда</p>
-            <p className="text-xs text-muted-foreground">оружие {analysis.weaponRelative.toFixed(0)}% · сет {analysis.setRelative.toFixed(0)}%</p>
+          <div className="relative z-10 flex items-center gap-3 sm:shrink-0">
+            <div className="text-right text-sm">
+              <p className="text-muted-foreground">Оценка билда</p>
+              <p className="text-xs text-muted-foreground">
+                оружие {analysis.weaponRelative.toFixed(0)}% · сет{" "}
+                {analysis.setRelative.toFixed(0)}%
+              </p>
+            </div>
+            <ScoreRing score={analysis.overall} size={72} />
           </div>
-          <ScoreRing score={analysis.overall} size={72} />
         </div>
       </div>
 

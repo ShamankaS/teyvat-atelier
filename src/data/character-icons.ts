@@ -138,3 +138,10 @@ export function characterIconUrl(key: string): string | null {
   if (!icon) return null;
   return `${ENKA_UI}/UI_AvatarIcon_${icon}.png`;
 }
+
+/** Full gacha splash art (Enka), or null if unknown. Traveler uses portrait only. */
+export function characterSplashUrl(key: string): string | null {
+  const icon = CHARACTER_ICON_KEYS[key];
+  if (!icon || icon === "PlayerBoy" || icon === "PlayerGirl") return null;
+  return `${ENKA_UI}/UI_Gacha_AvatarImg_${icon}.png`;
+}
