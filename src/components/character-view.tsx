@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import type { ComponentProps } from "react";
 import { ArrowLeft, Star } from "lucide-react";
-import { CHARACTERS, characterName, characterSplashUrl } from "@/data/characters";
+import { CHARACTERS, characterName } from "@/data/characters";
 import { setName } from "@/data/sets";
 import { weaponName } from "@/data/weapons";
 import { ELEMENT_LABELS, WEAPON_TYPE_LABELS, statLabel } from "@/data/catalog";
 import {
   ELEMENT_ACCENT_TEXT,
-  ELEMENT_HERO_BORDER,
   ELEMENT_HERO_WASH,
+  ELEMENT_PANEL,
+  ELEMENT_SURFACE,
 } from "@/data/element-theme";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { ScoreRing } from "@/components/score-ring";
@@ -23,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatStatValue } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import type { Analysis } from "@/lib/analyze";
+import type { ElementKey } from "@/lib/good/types";
 
 const KIND_LABEL = {
   weapon: "Оружие",
@@ -47,39 +49,34 @@ function RarityStars({ rarity }: { rarity: 4 | 5 }) {
   );
 }
 
-function CharacterSplash({ characterKey }: { characterKey: string }) {
-  const src = characterSplashUrl(characterKey);
-  const [failed, setFailed] = useState(false);
+function surfaceClass(element?: ElementKey) {
+  return element ? ELEMENT_SURFACE[element] : "border-white/10 bg-white/5 ring-white/10";
+}
 
-  useEffect(() => {
-    setFailed(false);
-  }, [src]);
+function panelClass(element?: ElementKey) {
+  return element ? ELEMENT_PANEL[element] : "border-white/10 bg-white/5";
+}
 
-  if (!src || failed) return null;
-
+function ThemedCard({
+  element,
+  className,
+  ...props
+}: ComponentProps<typeof Card> & { element?: ElementKey }) {
   return (
-    <div
-      className="pointer-events-none absolute inset-y-0 right-0 hidden w-[48%] overflow-hidden sm:block"
-      aria-hidden
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt=""
-        className="h-full w-full object-cover object-[center_15%] opacity-90"
-        style={{
-          maskImage: "linear-gradient(to left, black 35%, transparent 95%)",
-          WebkitMaskImage: "linear-gradient(to left, black 35%, transparent 95%)",
-        }}
-        loading="lazy"
-        decoding="async"
-        onError={() => setFailed(true)}
-      />
-    </div>
+    <Card
+      className={cn("border bg-transparent ring-1", surfaceClass(element), className)}
+      {...props}
+    />
   );
 }
 
-function Suggestions({ analysis }: { analysis: Analysis }) {
+function Suggestions({
+  analysis,
+  element,
+}: {
+  analysis: Analysis;
+  element?: ElementKey;
+}) {
   if (analysis.suggestions.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -92,11 +89,18 @@ function Suggestions({ analysis }: { analysis: Analysis }) {
       {analysis.suggestions.map((s, i) => (
         <li
           key={s.id}
-          className="rounded-xl border border-white/10 bg-white/3 p-4"
+          className={cn("rounded-xl border p-4", panelClass(element))}
         >
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="flex size-6 items-center justify-center rounded-full bg-primary/20 text-xs font-semibold text-primary">
+              <span
+                className={cn(
+                  "flex size-6 items-center justify-center rounded-full text-xs font-semibold",
+                  element
+                    ? cn("bg-white/10", ELEMENT_ACCENT_TEXT[element])
+                    : "bg-primary/20 text-primary",
+                )}
+              >
                 {i + 1}
               </span>
               <Badge variant="outline">{KIND_LABEL[s.kind]}</Badge>
@@ -169,8 +173,8 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
 
       <div
         className={cn(
-          "relative overflow-hidden rounded-2xl border bg-white/4 p-5",
-          element ? ELEMENT_HERO_BORDER[element] : "border-white/10",
+          "relative overflow-hidden rounded-2xl border ring-1",
+          surfaceClass(element),
         )}
       >
         <div
@@ -180,16 +184,15 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
           )}
           aria-hidden
         />
-        <CharacterSplash characterKey={character.key} />
 
-        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="relative z-10 flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
           <CharacterAvatar
             characterKey={character.key}
             name={name}
             element={element}
             size="lg"
           />
-          <div className="min-w-0 flex-1 sm:pr-[42%]">
+          <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-semibold tracking-tight">{name}</h1>
               <Badge>C{character.constellation}</Badge>
@@ -204,18 +207,18 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
               {element ? (
                 <Badge
                   variant="outline"
-                  className={cn("bg-black/20", ELEMENT_ACCENT_TEXT[element])}
+                  className={cn(panelClass(element), ELEMENT_ACCENT_TEXT[element])}
                 >
                   {ELEMENT_LABELS[element]}
                 </Badge>
               ) : null}
               {weaponType ? (
-                <Badge variant="outline" className="bg-black/20">
+                <Badge variant="outline" className={panelClass(element)}>
                   {WEAPON_TYPE_LABELS[weaponType]}
                 </Badge>
               ) : null}
               {rarity ? (
-                <Badge variant="outline" className="bg-black/20">
+                <Badge variant="outline" className={panelClass(element)}>
                   {rarity}★
                 </Badge>
               ) : null}
@@ -225,32 +228,46 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
               {character.talent.burst}
               {guide ? ` · пачка: ${guide.team}` : null}
             </p>
-            {guide ? (
-              <p className="mt-2 max-w-xl text-sm text-muted-foreground">{guide.notes}</p>
-            ) : null}
-          </div>
-          <div className="relative z-10 flex items-center gap-3 sm:shrink-0">
-            <div className="text-right text-sm">
-              <p className="text-muted-foreground">Оценка билда</p>
-              <p className="text-xs text-muted-foreground">
-                оружие {analysis.weaponRelative.toFixed(0)}% · сет{" "}
-                {analysis.setRelative.toFixed(0)}%
+            {guide?.notes ? (
+              <p className="mt-2 line-clamp-2 max-w-xl text-sm text-muted-foreground">
+                {guide.notes}
               </p>
+            ) : null}
+
+            <div
+              className={cn(
+                "mt-4 inline-flex items-center gap-3 rounded-xl border px-3 py-2",
+                panelClass(element),
+              )}
+            >
+              <ScoreRing score={analysis.overall} size={56} />
+              <div className="text-sm">
+                <p className="font-medium">Оценка билда</p>
+                <p className="text-xs text-muted-foreground">
+                  оружие {analysis.weaponRelative.toFixed(0)}% · сет{" "}
+                  {analysis.setRelative.toFixed(0)}%
+                </p>
+              </div>
             </div>
-            <ScoreRing score={analysis.overall} size={72} />
           </div>
         </div>
       </div>
 
       <Tabs defaultValue="optimize">
-        <TabsList className="w-full justify-start overflow-x-auto">
+        <TabsList
+          className={cn(
+            "w-full justify-start overflow-x-auto border ring-1",
+            surfaceClass(element),
+            "bg-transparent",
+          )}
+        >
           <TabsTrigger value="optimize">Оптимизация</TabsTrigger>
           <TabsTrigger value="loadout">Как одет</TabsTrigger>
           <TabsTrigger value="guide">Таблицы %</TabsTrigger>
         </TabsList>
 
         <TabsContent value="optimize" className="space-y-6">
-          <Card>
+          <ThemedCard element={element}>
             <CardHeader>
               <CardTitle>Что менять в первую очередь</CardTitle>
               <CardDescription>
@@ -259,15 +276,18 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Suggestions analysis={analysis} />
+              <Suggestions analysis={analysis} element={element} />
             </CardContent>
-          </Card>
+          </ThemedCard>
 
           {analysis.capResults.length > 0 ? (
-            <Card>
+            <ThemedCard element={element}>
               <CardHeader>
                 <CardTitle>Капы статов</CardTitle>
-                <CardDescription>Обязательные цели из гайда. Значения с артефактов, оружия и 2pc бонусов; боевые 4pc (MH, Кодекс) включены.</CardDescription>
+                <CardDescription>
+                  Обязательные цели из гайда. Значения с артефактов, оружия и 2pc бонусов; боевые
+                  4pc (MH, Кодекс) включены.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {analysis.capResults.map((c) => (
@@ -275,8 +295,15 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                     <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2 text-sm">
                       <span className="font-medium">
                         {statLabel(c.key)}{" "}
-                        <Badge variant={c.priority === "mandatory" ? "destructive" : "outline"} className="ml-1">
-                          {c.priority === "mandatory" ? "обязательный" : c.priority === "recommended" ? "желательный" : "люкс"}
+                        <Badge
+                          variant={c.priority === "mandatory" ? "destructive" : "outline"}
+                          className="ml-1"
+                        >
+                          {c.priority === "mandatory"
+                            ? "обязательный"
+                            : c.priority === "recommended"
+                              ? "желательный"
+                              : "люкс"}
                         </Badge>
                       </span>
                       <span className="tabular-nums text-muted-foreground">
@@ -288,13 +315,13 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                   </div>
                 ))}
               </CardContent>
-            </Card>
+            </ThemedCard>
           ) : null}
         </TabsContent>
 
         <TabsContent value="loadout" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
+            <ThemedCard element={element}>
               <CardHeader>
                 <CardTitle>Оружие</CardTitle>
               </CardHeader>
@@ -311,8 +338,8 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                   <p className="text-sm text-rose-300">Оружие не надето</p>
                 )}
               </CardContent>
-            </Card>
-            <Card>
+            </ThemedCard>
+            <ThemedCard element={element}>
               <CardHeader>
                 <CardTitle>Сеты</CardTitle>
               </CardHeader>
@@ -332,9 +359,9 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                   Эффективность сета ≈ {analysis.setRelative.toFixed(0)}%
                 </p>
               </CardContent>
-            </Card>
+            </ThemedCard>
           </div>
-          <Card>
+          <ThemedCard element={element}>
             <CardHeader>
               <CardTitle>Артефакты</CardTitle>
             </CardHeader>
@@ -342,7 +369,7 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
               {slots.map((slot) => {
                 const art = build.artifacts.find((a) => a.slotKey === slot);
                 return (
-                  <div key={slot} className="rounded-xl border border-white/10 p-3">
+                  <div key={slot} className={cn("rounded-xl border p-3", panelClass(element))}>
                     <p className="text-xs text-muted-foreground">{slotRu[slot]}</p>
                     {art ? (
                       <>
@@ -365,8 +392,8 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                 );
               })}
             </CardContent>
-          </Card>
-          <Card>
+          </ThemedCard>
+          <ThemedCard element={element}>
             <CardHeader>
               <CardTitle>Сводка статов</CardTitle>
             </CardHeader>
@@ -381,19 +408,19 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                   ["critDMG_", build.stats.critDMG_],
                 ] as const
               ).map(([k, v]) => (
-                <div key={k} className="rounded-lg bg-white/5 px-3 py-2">
+                <div key={k} className={cn("rounded-lg border px-3 py-2", panelClass(element))}>
                   <p className="text-xs text-muted-foreground">{statLabel(k)}</p>
                   <p className="tabular-nums font-medium">{formatStatValue(k, v)}</p>
                 </div>
               ))}
             </CardContent>
-          </Card>
+          </ThemedCard>
         </TabsContent>
 
         <TabsContent value="guide">
           {guide ? (
             <div className="grid gap-4 lg:grid-cols-2">
-              <Card>
+              <ThemedCard element={element}>
                 <CardHeader>
                   <CardTitle>Оружие относительно BiS</CardTitle>
                   <CardDescription>{guide.scenario}</CardDescription>
@@ -407,14 +434,25 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                       return (
                         <li
                           key={w.key}
-                          className={`rounded-lg px-3 py-2 ${active ? "bg-primary/15 ring-1 ring-primary/40" : "bg-white/4"}`}
+                          className={cn(
+                            "rounded-lg border px-3 py-2",
+                            panelClass(element),
+                            active && "ring-2 ring-white/35",
+                          )}
                         >
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-sm font-medium">
                               {weaponName(w.key)}
                               {active ? " · на персонаже" : ""}
                             </span>
-                            <span className="tabular-nums text-sm text-primary">{w.relative}%</span>
+                            <span
+                              className={cn(
+                                "tabular-nums text-sm",
+                                element ? ELEMENT_ACCENT_TEXT[element] : "text-primary",
+                              )}
+                            >
+                              {w.relative}%
+                            </span>
                           </div>
                           <p className="text-xs text-muted-foreground">{w.notes}</p>
                           <Progress value={w.relative} className="mt-2 h-1.5" />
@@ -423,20 +461,27 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                     })}
                   </ul>
                 </CardContent>
-              </Card>
-              <Card>
+              </ThemedCard>
+              <ThemedCard element={element}>
                 <CardHeader>
                   <CardTitle>Сеты относительно референса</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {guide.sets.map((s) => (
-                      <li key={s.id} className="rounded-lg bg-white/4 px-3 py-2">
+                      <li key={s.id} className={cn("rounded-lg border px-3 py-2", panelClass(element))}>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm font-medium">
                             {s.pieces.map((p) => `${p.count}pc ${setName(p.set)}`).join(" + ")}
                           </span>
-                          <span className="tabular-nums text-sm text-primary">{s.relative}%</span>
+                          <span
+                            className={cn(
+                              "tabular-nums text-sm",
+                              element ? ELEMENT_ACCENT_TEXT[element] : "text-primary",
+                            )}
+                          >
+                            {s.relative}%
+                          </span>
                         </div>
                         <p className="text-xs text-muted-foreground">{s.notes}</p>
                         <Progress value={Math.min(100, s.relative)} className="mt-2 h-1.5" />
@@ -453,16 +498,21 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                       href={guide.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary underline-offset-2 hover:underline"
+                      className={cn(
+                        "underline-offset-2 hover:underline",
+                        element ? ELEMENT_ACCENT_TEXT[element] : "text-primary",
+                      )}
                     >
                       Prydwen
                     </a>
                   </p>
                 </CardContent>
-              </Card>
+              </ThemedCard>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Для этого персонажа процентная таблица ещё не заведена.</p>
+            <p className="text-sm text-muted-foreground">
+              Для этого персонажа процентная таблица ещё не заведена.
+            </p>
           )}
         </TabsContent>
       </Tabs>

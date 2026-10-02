@@ -1439,10 +1439,3 @@ export function characterIconUrl(key: string): string | null {
   if (!icon) return null;
   return `https://enka.network/ui/UI_AvatarIcon_${icon}.png`;
 }
-
-/** Full gacha splash art, or null. Traveler has no separate splash. */
-export function characterSplashUrl(key: string): string | null {
-  const icon = CHARACTERS[key]?.icon;
-  if (!icon || icon === "PlayerBoy" || icon === "PlayerGirl") return null;
-  return `https://enka.network/ui/UI_Gacha_AvatarImg_${icon}.png`;
-}
