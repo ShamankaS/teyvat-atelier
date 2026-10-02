@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { characterName, setName, statLabel, weaponName } from "@/data/catalog";
+import { characterName } from "@/data/characters";
+import { setName } from "@/data/sets";
+import { weaponName } from "@/data/weapons";
+import { statLabel } from "@/data/catalog";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { ScoreRing } from "@/components/score-ring";
 import { useAccount } from "@/components/account-provider";
@@ -343,7 +346,15 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                     {guide.talentPriority
                       .map((t) => (t === "auto" ? "авто" : t === "skill" ? "навык" : "ульта"))
                       .join(" > ")}
-                    .
+                    .{" "}
+                    <a
+                      href={guide.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline-offset-2 hover:underline"
+                    >
+                      Prydwen
+                    </a>
                   </p>
                 </CardContent>
               </Card>

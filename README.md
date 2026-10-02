@@ -10,14 +10,15 @@ No backend, no Hoyoverse login, no database. Parsing and scoring run in the brow
 
 Genshin guides usually say “Homa is BiS” or “farm Emblem 4pc”. This tool answers the next question: **how far is *your* build from that, and what swap is worth the most right now** — including weapons that are already in the inventory but equipped on someone else.
 
-It is a decision helper, not a rotation simulator. Relative weapon/set numbers are typical **team DPS vs R1 BiS** in a named reference team (KQM / TCL / community sheets), rounded.
+It is a decision helper, not a rotation simulator. Relative weapon/set numbers are typical **team DPS vs R1 BiS** in a named reference team, rounded. Primary sheet source: [Prydwen.gg](https://www.prydwen.gg/genshin-impact) (full builds where published, otherwise Enka usage), cross-checked with KQM / TCL / community calcs.
 
 ## Stack
 
 - **Next.js** (App Router) + **TypeScript**
 - **Tailwind CSS** + **shadcn/ui**
 - Domain logic in `src/lib` (GOOD parser, stat totals, ranked suggestions)
-- Guide tables in `src/data/guides.ts`
+- Guide tables in `src/data/guides.ts` (Prydwen + KQM/TCL)
+- Catalog/guide source map: [docs/data-sources.md](docs/data-sources.md)
 
 ## Features
 
@@ -33,7 +34,11 @@ It is a decision helper, not a rotation simulator. Relative weapon/set numbers a
 src/app/                 # pages
 src/components/          # UI
 src/data/guides.ts       # relative DPS tables and stat caps
-src/data/catalog.ts      # names, weapon stats, set bonuses
+src/data/characters.ts   # roster L90 bases + RU names
+src/data/weapons.ts      # weapon L90 bases + RU names
+src/data/sets.ts         # set rarity, 2pc, RU names
+src/data/catalog.ts      # stat/element/weapon-type labels
+docs/data-sources.md     # where to look up wiki / GO / Prydwen data
 src/lib/good/            # GOOD types + parser
 src/lib/compute.ts       # equipped stats from artifacts/weapons
 src/lib/analyze.ts       # compare loadout vs guide → suggestions

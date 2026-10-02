@@ -1,0 +1,30 @@
+---
+description: Where to look up Genshin catalog and guide data (HoYoWiki, GO, Prydwen)
+globs: src/data/**
+alwaysApply: false
+---
+
+# Data sources
+
+Full reference: [docs/data-sources.md](../../docs/data-sources.md)
+
+## Priority
+
+| Need | Source | Write to |
+|------|--------|----------|
+| RU display names | HoYoWiki (`ru-ru`) | `characters.ts` / `weapons.ts` / `sets.ts` `.name` |
+| L90 / A6 base stats (released) | Genshin Optimizer datamine | same |
+| L90 stats (unreleased / missing in GO) | HoYoWiki entry «Возвысить» | same |
+| Set rarity + 2pc | GO `artifact_set.json` + wiki set effects | `sets.ts` |
+| Guide % tables | Prydwen → KQM / TCL | `guides.ts` |
+
+## HoYoWiki (official)
+
+- Characters: https://wiki.hoyolab.com/pc/genshin/aggregate/2 (`menu_id: "2"`)
+- Weapons: https://wiki.hoyolab.com/pc/genshin/aggregate/4 (`menu_id: "4"`)
+- Sets: https://wiki.hoyolab.com/pc/genshin/aggregate/5 (`menu_id: "5"`)
+- List API: `POST https://sg-wiki-api.hoyolab.com/hoyowiki/genshin/wapi/get_entry_page_list`
+- Page API: `GET .../wapi/entry_page?entry_page_id=`
+- Headers: `x-rpc-language: ru-ru`, `x-rpc-wiki_app: genshin`
+
+Do **not** use fandom wiki for RU names. Filter out Manekin/Manekina.
