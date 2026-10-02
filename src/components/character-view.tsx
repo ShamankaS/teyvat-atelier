@@ -7,6 +7,7 @@ import { setName } from "@/data/sets";
 import { weaponName } from "@/data/weapons";
 import { statLabel } from "@/data/catalog";
 import { CharacterAvatar } from "@/components/character-avatar";
+import { WeaponIcon } from "@/components/weapon-icon";
 import { ScoreRing } from "@/components/score-ring";
 import { useAccount } from "@/components/account-provider";
 import { Badge } from "@/components/ui/badge";
@@ -342,18 +343,23 @@ export function CharacterView({ characterKey }: { characterKey: string }) {
                       const own = weaponOwnership(account, character.key, w.key);
                       return (
                         <li key={w.key} className={`rounded-lg px-3 py-2 ${OWNERSHIP_ROW[own.status]}`}>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-sm font-medium">
-                              {weaponName(w.key)}
-                              <span className="font-normal text-muted-foreground">
-                                {" "}
-                                · {ownershipLabel(own)}
-                              </span>
-                            </span>
-                            <span className="tabular-nums text-sm text-primary">{w.relative}%</span>
+                          <div className="flex items-start gap-3">
+                            <WeaponIcon weaponKey={w.key} />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-sm font-medium">
+                                  {weaponName(w.key)}
+                                  <span className="font-normal text-muted-foreground">
+                                    {" "}
+                                    · {ownershipLabel(own)}
+                                  </span>
+                                </span>
+                                <span className="shrink-0 tabular-nums text-sm text-primary">{w.relative}%</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">{w.notes}</p>
+                              <Progress value={w.relative} className="mt-2 h-1.5" />
+                            </div>
                           </div>
-                          <p className="text-xs text-muted-foreground">{w.notes}</p>
-                          <Progress value={w.relative} className="mt-2 h-1.5" />
                         </li>
                       );
                     })}
