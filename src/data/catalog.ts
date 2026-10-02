@@ -1,5 +1,9 @@
 import type { ElementKey, StatKey, WeaponType } from "@/lib/good/types";
 import { CHARACTER_NAMES } from "@/data/names";
+import { SET_NAMES } from "@/data/set-names";
+import { WEAPON_NAMES } from "@/data/weapon-names";
+
+export { SET_NAMES, WEAPON_NAMES };
 
 export const STAT_LABELS: Record<string, string> = {
   hp: "HP",
@@ -1354,57 +1358,6 @@ export const WEAPONS: Record<string, WeaponInfo> = {
   },
 };
 
-export const SET_NAMES: Record<string, string> = {
-  CrimsonWitchOfFlames: "Горящая алая ведьма",
-  ShimenawasReminiscence: "Воспоминания Симэнавы",
-  GildedDreams: "Позолоченные сны",
-  WanderersTroupe: "Странствующий ансамбль",
-  MarechausseeHunter: "Охотник Сумеречного двора",
-  GoldenTroupe: "Золотая труппа",
-  EmblemOfSeveredFate: "Эмблема рассечённой судьбы",
-  NoblesseOblige: "Церемония древней знати",
-  TenacityOfTheMillelith: "Стойкость Миллелита",
-  ViridescentVenerer: "Изумрудная тень",
-  DeepwoodMemories: "Воспоминания дремучего леса",
-  FlowerOfParadiseLost: "Цветок потерянного рая",
-  HeartOfDepth: "Сердце глубин",
-  BlizzardStrayer: "Заблудший в метели",
-  ThunderingFury: "Громогласный рёв ярости",
-  Thundersoother: "Усмиряющий гром",
-  ArchaicPetra: "Архаичный камень",
-  GladiatorsFinale: "Конец гладиатора",
-  VermillionHereafter: "Киноварное загробье",
-  EchoesOfAnOffering: "Отголоски подношения",
-  DesertPavilionChronicle: "Хроники Чертогов в пустыне",
-  VourukashasGlow: "Сияние Вурукаши",
-  NymphsDream: "Сон нимфы",
-  NighttimeWhispersInTheEchoingWoods: "Ночной шёпот в лесу отголосков",
-  FragmentOfHarmonicWhimsy: "Фрагмент гармонической фантазии",
-  UnfinishedReverie: "Незаконченная грёза",
-  ObsidianCodex: "Обсидиановый кодекс",
-  ScrollOfTheHeroOfCinderCity: "Свиток героя сожжённого города",
-  Instructor: "Инструктор",
-  TheExile: "Изгнанник",
-  MaidenBeloved: "Возлюбленная юная дева",
-  OceanHuedClam: "Моллюск морских красок",
-  SongOfDaysPast: "Песнь былых времён",
-  RetracingBolide: "Встречная комета",
-  Lavawalker: "Ступающий по лаве",
-  HuskOfOpulentDreams: "Кокон сладких грёз",
-  PaleFlame: "Бледный огонь",
-  LongNightsOath: "Клятва долгой ночи",
-  FinaleOfTheDeepGalleries: "Финал глубоких галерей",
-  Whimsy: "Фрагмент гармонической фантазии",
-  ADayCarvedFromRisingWinds: "День, вырезанный из восходящих ветров",
-  AubadeOfMorningstarAndMoon: "Аубада утренней звезды и луны",
-  BloodstainedChivalry: "Рыцарь крови",
-  NightOfTheSkysUnveiling: "Ночь раскрытия небес",
-  SilkenMoonsSerenade: "Серенада шелковой луны",
-  CelestialGift: "Небесный дар",
-  DisenchantmentInDeepShadow: "Разочарование в глубокой тени",
-  HeartOfTheFurnace: "Сердце печи",
-};
-
 export const TWO_PC_STATS: Record<string, { key: StatKey | "skill" | "burst" | "na"; value: number }> = {
   CrimsonWitchOfFlames: { key: "pyro_dmg_", value: 15 },
   HeartOfDepth: { key: "hydro_dmg_", value: 15 },
@@ -1456,7 +1409,7 @@ export function characterName(key: string) {
 }
 
 export function weaponName(key: string) {
-  return WEAPONS[key]?.name ?? key;
+  return WEAPON_NAMES[key] ?? WEAPONS[key]?.name ?? key;
 }
 
 export function setName(key: string) {
